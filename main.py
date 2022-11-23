@@ -7,12 +7,7 @@ import random as r
 
 
 
-# Idk if we wanna do it like this
-def timestep(env, step_size, env_size) -> None:
-    update_agent_positions(env, step_size, env_size)
-    infect_one_env(env)
-    recover_one_env(env)
-    pass
+
 
 def infect_one_env(environment: list):
     for agent in environment:
@@ -40,13 +35,14 @@ def recover_one_env(environment: list) -> None:
             agent.I = False
             agent.R = True
 
-def update_agent_positions(env, step_size, pos_limit) -> None:
+def update_agent_positions_random(env, step_size, pos_limit) -> None:
     for agent in env:
         agent.random_move(pos_limit, step_size)
 
 # Here 'attr' is the string "S", "E", "I" or "R"
+# getattr(agent, var) is essentially the same as agent.var
 def count_status_one_env(env: list, attr: str):
-    num = 0 
+    num = 0
     for agent in env:
         if getattr(agent, attr, default_value=False):
             num = num + 1
@@ -54,20 +50,30 @@ def count_status_one_env(env: list, attr: str):
 
 
 
+def timestep(env, step_size, env_size) -> None:
+    update_agent_positions_random(env, step_size, env_size)
+    infect_one_env(env)
+    recover_one_env(env)
+
 def main():
+    # Constants
     ENVIRONMENT_COUNT = 1
     AGENT_COUNT = 100
     TIMESTEPS = 500
     ENV_SIZE = 100
     STEP_SIZE = 5
 
+    # Initialization
     environment = []
     for _ in range(AGENT_COUNT):
         environment.append(Agent(pos=(ENV_SIZE*random.random(), ENV_SIZE*random.random())))
-    agents = random.sample(environment, 10)
-    for agent in agents:
+    initial_infected = r.sample(environment, 10)
+
+    for agent in initial_infected:
         agent.S = False
         agent.I = True
+
+
 
     for t in range(TIMESTEPS):
         pyplot.clf()
@@ -82,10 +88,11 @@ def main():
                 pyplot.plot(agent.pos[0], agent.pos[1], "og")
             if agent.E:
                 pyplot.plot(agent.pos[0], agent.pos[1], "oy")
-            
+                
+        pyplot.xlim(0, 100)
+        pyplot.ylim(0, 100)
         pyplot.pause(0.05)
-        pyplot.xlim([0, 100])
-        pyplot.ylim([0, 100])
+        pyplot.axis("square")
         pyplot.show(block=False)
 
 
