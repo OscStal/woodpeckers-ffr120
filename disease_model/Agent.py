@@ -3,7 +3,7 @@ import random
 class Agent():
 
     DEFAULT_POS = (0, 0)
-    DEFAULT_RADIUS = 1
+    DEFAULT_RADIUS = 3
     DEFAULT_I_RATE = 0.8
     DEFAULT_R_RATE = 0.02
     DEFAULT_E2I_RATE = 0.3

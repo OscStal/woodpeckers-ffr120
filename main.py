@@ -44,11 +44,19 @@ def update_agent_positions(env, step_size, pos_limit) -> None:
     for agent in env:
         agent.random_move(pos_limit, step_size)
 
+# Here 'attr' is the string "S", "E", "I" or "R"
+def count_status_one_env(env: list, attr: str):
+    num = 0 
+    for agent in env:
+        if getattr(agent, attr, default_value=False):
+            num = num + 1
+    return num
+
 
 
 def main():
     ENVIRONMENT_COUNT = 1
-    AGENT_COUNT = 50
+    AGENT_COUNT = 100
     TIMESTEPS = 500
     ENV_SIZE = 100
     STEP_SIZE = 5
@@ -56,7 +64,7 @@ def main():
     environment = []
     for _ in range(AGENT_COUNT):
         environment.append(Agent(pos=(ENV_SIZE*random.random(), ENV_SIZE*random.random())))
-    agents = random.sample(environment, 5)
+    agents = random.sample(environment, 10)
     for agent in agents:
         agent.S = False
         agent.I = True
