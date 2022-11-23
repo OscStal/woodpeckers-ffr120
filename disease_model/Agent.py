@@ -19,18 +19,24 @@ class Agent():
         d_rate=DEFAULT_D_RATE
         ) -> None:
 
-        self.parameters = {}    # If we want different paramters per agent?
+        # Misc, optional, etc parameters can be added to this dict
+        self.parameters = {}
+
+        # Disease related paramteres
         self.pos = pos
         self.radius = rad
         self.infect_prob: float = i_rate   # Probability to infect nearby
         self.e2i_prob = e2i_rate    # Probability to go from exposed to infected
         self.recover_prob = r_rate  # Probability to recover
         self.death_prob = d_rate
-
         self.S = True
         self.E = False
         self.I = False
         self.R = False
+
+        # Economy related parameters?
+
+
 
     def random_move(self, pos_limit, step_size):
         new_x = (self.pos[0] + (step_size*(random.random()-0.5)))%pos_limit
