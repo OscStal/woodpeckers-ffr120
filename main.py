@@ -16,12 +16,12 @@ def timestep(env, step_size, env_size) -> None:
 
 def infect_one_env(environment: list):
     for agent in environment:
-        if (agent.S or agent.E) and (random.random() < agent.infect_rate):
+        if (agent.I) and (random.random() < agent.infect_prob):
             infect_nearby_agents(environment, agent.pos, agent.radius)
 
 def infect_nearby_agents(env, infection_pos, infection_radius):
     for agent in env:
-        if agent.S and r.random() < agent.infect_rate:
+        if agent.S:
             offset = tuple(np.subtract(infection_pos, agent.pos))
             distance = np.sqrt(offset[0]*offset[0] + offset[1]*offset[1])
             if distance < infection_radius:
@@ -29,14 +29,14 @@ def infect_nearby_agents(env, infection_pos, infection_radius):
                 agent.S = False
                 # Set something to track when to go form exposed to infected
 
-        if agent.E and r.random() < agent.e2i_rate:
+        if agent.E and r.random() < agent.e2i_prob:
             agent.E = False
             agent.I = True
 
 
 def recover_one_env(environment: list) -> None:
     for agent in environment:
-        if agent.I and (random.random() < agent.recover_rate):
+        if agent.I and (random.random() < agent.recover_prob):
             agent.I = False
             agent.R = True
 
@@ -48,8 +48,8 @@ def update_agent_positions(env, step_size, pos_limit) -> None:
 
 def main():
     ENVIRONMENT_COUNT = 1
-    AGENT_COUNT = 100
-    TIMESTEPS = 1000
+    AGENT_COUNT = 50
+    TIMESTEPS = 500
     ENV_SIZE = 100
     STEP_SIZE = 5
 

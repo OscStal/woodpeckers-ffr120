@@ -2,14 +2,27 @@ import random
 
 class Agent():
 
-    def __init__(self, pos=(0, 0), rad=1, i_rate=0.1, r_rate=0.05, e2i_rate=0.5) -> None:
+    DEFAULT_POS = (0, 0)
+    DEFAULT_RADIUS = 1
+    DEFAULT_I_RATE = 0.8
+    DEFAULT_R_RATE = 0.02
+    DEFAULT_E2I_RATE = 0.3
+
+    def __init__(
+        self, 
+        pos=DEFAULT_POS, 
+        rad=DEFAULT_RADIUS,
+        i_rate=DEFAULT_I_RATE,
+        r_rate=DEFAULT_R_RATE,
+        e2i_rate=DEFAULT_E2I_RATE
+        ) -> None:
 
         self.parameters = {}    # If we want different paramters per agent?
         self.pos = pos
         self.radius = rad
-        self.infect_rate = i_rate
-        self.e2i_rate = e2i_rate
-        self.recover_rate = r_rate
+        self.infect_prob: float = i_rate   # Probability to infect nearby
+        self.e2i_prob = e2i_rate    # Probability to go from exposed to infected
+        self.recover_prob = r_rate  # Probability to recover
 
         self.S = True
         self.E = False
