@@ -58,10 +58,10 @@ def timestep_one_env(env, step_size, env_size) -> None:
 def main():
     # Constants
     ENVIRONMENT_COUNT = 1
-    AGENT_COUNT_PER_ENV = 100
+    AGENT_COUNT_PER_ENV = 500
     TIMESTEPS = 500
-    ENV_SIZE = 100
-    STEP_SIZE = 5
+    ENV_SIZE = 200
+    AGENT_STEP_SIZE = 5
 
     # Initialization
     environment_list = []
@@ -85,7 +85,7 @@ def main():
         pyplot.clf()
         print(f"step:{t}")
         for environment in environment_list:
-            timestep_one_env(environment, STEP_SIZE, ENV_SIZE)
+            timestep_one_env(environment, AGENT_STEP_SIZE, ENV_SIZE)
 
         for agent in environment_list[0]:
             if agent.I:
@@ -97,10 +97,9 @@ def main():
             if agent.E:
                 pyplot.plot(agent.pos[0], agent.pos[1], "oy")
 
-        pyplot.xlim(0, 100)
-        pyplot.ylim(0, 100)
-        pyplot.pause(0.05)
-        pyplot.axis("square")
+        pyplot.xlim(0, ENV_SIZE)
+        pyplot.ylim(0, ENV_SIZE)
+        pyplot.pause(0.01)
         pyplot.show(block=False)
 
 

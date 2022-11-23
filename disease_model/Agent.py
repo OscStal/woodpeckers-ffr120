@@ -35,7 +35,9 @@ class Agent():
         self.R = False
 
         # Economy related parameters?
-
+        self.resource_amount = 0
+        self.resource_min = 0
+        self.cash = 0
 
 
     def random_move(self, pos_limit, step_size):
