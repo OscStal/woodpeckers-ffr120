@@ -50,7 +50,7 @@ def count_status_one_env(env: list, attr: str):
 
 
 
-def timestep(env, step_size, env_size) -> None:
+def timestep_one_env(env, step_size, env_size) -> None:
     update_agent_positions_random(env, step_size, env_size)
     infect_one_env(env)
     recover_one_env(env)
@@ -58,28 +58,36 @@ def timestep(env, step_size, env_size) -> None:
 def main():
     # Constants
     ENVIRONMENT_COUNT = 1
-    AGENT_COUNT = 100
+    AGENT_COUNT_PER_ENV = 100
     TIMESTEPS = 500
     ENV_SIZE = 100
     STEP_SIZE = 5
 
     # Initialization
-    environment = []
-    for _ in range(AGENT_COUNT):
-        environment.append(Agent(pos=(ENV_SIZE*random.random(), ENV_SIZE*random.random())))
-    initial_infected = r.sample(environment, 10)
+    environment_list = []
+    quarantine = []
+    for _ in range(ENVIRONMENT_COUNT):
+        environment_list.append([])
 
-    for agent in initial_infected:
-        agent.S = False
-        agent.I = True
+    for environment in environment_list:
+        for _ in range(AGENT_COUNT_PER_ENV):
+            environment.append(Agent(pos=(ENV_SIZE*random.random(), ENV_SIZE*random.random())))
+
+    for environment in r.sample(environment_list, len(environment_list)):
+        initial_infected = r.sample(environment, 10)
+        for agent in initial_infected:
+            agent.S = False
+            agent.I = True
 
 
 
     for t in range(TIMESTEPS):
         pyplot.clf()
         print(f"step:{t}")
-        timestep(environment, STEP_SIZE, ENV_SIZE)
-        for agent in environment:
+        for environment in environment_list:
+            timestep_one_env(environment, STEP_SIZE, ENV_SIZE)
+
+        for agent in environment_list[0]:
             if agent.I:
                 pyplot.plot(agent.pos[0], agent.pos[1], "or")
             if agent.S:
@@ -88,7 +96,7 @@ def main():
                 pyplot.plot(agent.pos[0], agent.pos[1], "og")
             if agent.E:
                 pyplot.plot(agent.pos[0], agent.pos[1], "oy")
-                
+
         pyplot.xlim(0, 100)
         pyplot.ylim(0, 100)
         pyplot.pause(0.05)
