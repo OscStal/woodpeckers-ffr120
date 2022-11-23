@@ -7,6 +7,7 @@ class Agent():
     DEFAULT_I_RATE = 0.8
     DEFAULT_R_RATE = 0.02
     DEFAULT_E2I_RATE = 0.3
+    DEFAULT_D_RATE = 0
 
     def __init__(
         self, 
@@ -14,7 +15,8 @@ class Agent():
         rad=DEFAULT_RADIUS,
         i_rate=DEFAULT_I_RATE,
         r_rate=DEFAULT_R_RATE,
-        e2i_rate=DEFAULT_E2I_RATE
+        e2i_rate=DEFAULT_E2I_RATE,
+        d_rate=DEFAULT_D_RATE
         ) -> None:
 
         self.parameters = {}    # If we want different paramters per agent?
@@ -23,6 +25,7 @@ class Agent():
         self.infect_prob: float = i_rate   # Probability to infect nearby
         self.e2i_prob = e2i_rate    # Probability to go from exposed to infected
         self.recover_prob = r_rate  # Probability to recover
+        self.death_prob = d_rate
 
         self.S = True
         self.E = False
