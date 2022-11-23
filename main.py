@@ -3,14 +3,15 @@ import random
 from disease_model.Agent import Agent
 import numpy as np
 from matplotlib import pyplot
+import random as r
 
 
 
 # Idk if we wanna do it like this
-def timestep() -> None:
-    # Position update for every agent
-    # Infect people
-    # Recover people
+def timestep(env, step_size, env_size) -> None:
+    update_agent_positions(env, step_size, env_size)
+    infect_one_env(env)
+    recover_one_env(env)
     pass
 
 def infect_one_env(environment: list):
@@ -20,13 +21,18 @@ def infect_one_env(environment: list):
 
 def infect_nearby_agents(env, infection_pos, infection_radius):
     for agent in env:
-        if agent.S:
+        if agent.S and r.random() < agent.infect_rate:
             offset = tuple(np.subtract(infection_pos, agent.pos))
             distance = np.sqrt(offset[0]*offset[0] + offset[1]*offset[1])
             if distance < infection_radius:
                 agent.E = True
                 agent.S = False
                 # Set something to track when to go form exposed to infected
+
+        if agent.E and r.random() < agent.e2i_rate:
+            agent.E = False
+            agent.I = True
+
 
 def recover_one_env(environment: list) -> None:
     for agent in environment:
@@ -44,22 +50,38 @@ def main():
     ENVIRONMENT_COUNT = 1
     AGENT_COUNT = 100
     TIMESTEPS = 1000
+    ENV_SIZE = 100
+    STEP_SIZE = 5
 
-    env_size = 100
-    environment = np.zeros((ENVIRONMENT_COUNT, AGENT_COUNT), dtype=object)
     environment = []
     for _ in range(AGENT_COUNT):
-        environment.append(Agent(pos=(env_size*random.random(), env_size*random.random())))
-
-
-
-
+        environment.append(Agent(pos=(ENV_SIZE*random.random(), ENV_SIZE*random.random())))
+    agents = random.sample(environment, 5)
+    for agent in agents:
+        agent.S = False
+        agent.I = True
 
     for t in range(TIMESTEPS):
+        pyplot.clf()
+        print(f"step:{t}")
+        timestep(environment, STEP_SIZE, ENV_SIZE)
         for agent in environment:
-            agent.random_move(env_size)
-            pyplot.plot(agent.pos[0], agent.pos[1], "o")
-        pyplot.show()
+            if agent.I:
+                pyplot.plot(agent.pos[0], agent.pos[1], "or")
+            if agent.S:
+                pyplot.plot(agent.pos[0], agent.pos[1], "ob")
+            if agent.R:
+                pyplot.plot(agent.pos[0], agent.pos[1], "og")
+            if agent.E:
+                pyplot.plot(agent.pos[0], agent.pos[1], "oy")
+            
+        pyplot.pause(0.05)
+        pyplot.xlim([0, 100])
+        pyplot.ylim([0, 100])
+        pyplot.show(block=False)
+
+
+
 
 if __name__ == "__main__": 
     main()
