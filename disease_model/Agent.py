@@ -40,6 +40,6 @@ class Agent():
 
     def random_move(self, pos_limit, step_size):
         new_x = (self.pos[0] + (step_size*(random.random()-0.5)))%pos_limit
-        new_y = (self.pos[1] + (step_size*(random.random())-0.5))%pos_limit
+        new_y = (self.pos[1] + (step_size*(random.random()-0.5)))%pos_limit
         self.pos = (new_x, new_y)
 
