@@ -66,14 +66,17 @@ def main():
     # Initialization
     environment_list = []
     quarantine = []
+    dead_agents = []
+    
     for _ in range(ENVIRONMENT_COUNT):
-        environment_list.append([])
+        empty_environment = []
+        environment_list.append(empty_environment)
 
     for environment in environment_list:
         for _ in range(AGENT_COUNT_PER_ENV):
             environment.append(Agent(pos=(ENV_SIZE*random.random(), ENV_SIZE*random.random())))
 
-    for environment in r.sample(environment_list, len(environment_list)):
+    for environment in environment_list:
         initial_infected = r.sample(environment, 10)
         for agent in initial_infected:
             agent.S = False
