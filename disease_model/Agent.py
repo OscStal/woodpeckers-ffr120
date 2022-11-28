@@ -25,7 +25,7 @@ class Agent():
         # Disease related paramteres
         self.pos = pos
         self.radius = rad
-        self.infect_prob: float = i_rate   # Probability to infect nearby
+        self.infect_prob = i_rate   # Probability to infect nearby
         self.e2i_prob = e2i_rate    # Probability to go from exposed to infected
         self.recover_prob = r_rate  # Probability to recover
         self.death_prob = d_rate

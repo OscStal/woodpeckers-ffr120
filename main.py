@@ -21,7 +21,6 @@ def infect_nearby_agents(env, infection_pos, infection_radius):
             distance = np.sqrt(offset[0]*offset[0] + offset[1]*offset[1])
             if distance < infection_radius:
                 agent.status = "E"
-                # Set something to track when to go form exposed to infected
 
         if (agent.status == "E") and (r.random() < agent.e2i_prob):
             agent.status = "I"
@@ -96,6 +95,7 @@ def main():
         graph.clear()
         for environment in environment_list:
             timestep_one_env(environment, AGENT_STEP_SIZE, ENV_SIZE)
+
             (ss,ee,ii,rr) = count_status_one_env(environment)
             num_s[t] = ss
             num_e[t] = ee
