@@ -6,7 +6,7 @@ class Agent():
     DEFAULT_RADIUS = 3
     DEFAULT_I_RATE = 0.8
     DEFAULT_R_RATE = 0.02
-    DEFAULT_E2I_RATE = 0.3
+    DEFAULT_E2I_RATE = 0.5
     DEFAULT_D_RATE = 0
 
     def __init__(
@@ -29,16 +29,14 @@ class Agent():
         self.e2i_prob = e2i_rate    # Probability to go from exposed to infected
         self.recover_prob = r_rate  # Probability to recover
         self.death_prob = d_rate
-        self.S = True
-        self.E = False
-        self.I = False
-        self.R = False
-        self.Q = False
+        self.in_quarantine = False
+        self.status = "S"
 
         # Economy related parameters?
         self.resource_amount = 0
-        self.resource_min = 0
+        self.resource_minimum = 0
         self.cash = 0
+        self.salary = 0
 
 
     def random_move(self, pos_limit, step_size):

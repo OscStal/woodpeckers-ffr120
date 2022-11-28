@@ -11,29 +11,26 @@ import random as r
 
 def infect_one_env(environment: list):
     for agent in environment:
-        if (agent.I) and (random.random() < agent.infect_prob):
+        if (agent.status == "I") and (random.random() < agent.infect_prob):
             infect_nearby_agents(environment, agent.pos, agent.radius)
 
 def infect_nearby_agents(env, infection_pos, infection_radius):
     for agent in env:
-        if agent.S:
+        if agent.status == "S":
             offset = tuple(np.subtract(infection_pos, agent.pos))
             distance = np.sqrt(offset[0]*offset[0] + offset[1]*offset[1])
             if distance < infection_radius:
-                agent.E = True
-                agent.S = False
+                agent.status = "E"
                 # Set something to track when to go form exposed to infected
 
-        if agent.E and r.random() < agent.e2i_prob:
-            agent.E = False
-            agent.I = True
+        if (agent.status == "E") and (r.random() < agent.e2i_prob):
+            agent.status = "I"
 
 
 def recover_one_env(environment: list) -> None:
     for agent in environment:
-        if agent.I and (random.random() < agent.recover_prob):
-            agent.I = False
-            agent.R = True
+        if (agent.status == "I") and (random.random() < agent.recover_prob):
+            agent.status = "R"
 
 def update_agent_positions_random(env, step_size, pos_limit) -> None:
     for agent in env:
@@ -45,10 +42,10 @@ def count_status_one_env(env: list):
     num_E = 0
     num_R = 0
     for agent in env:
-        if agent.S: num_S = num_S + 1
-        if agent.E: num_E = num_E + 1
-        if agent.I: num_I = num_I + 1
-        if agent.R: num_R = num_R + 1
+        if agent.status == "S": num_S = num_S + 1
+        if agent.status == "E": num_E = num_E + 1
+        if agent.status == "I": num_I = num_I + 1
+        if agent.status == "R": num_R = num_R + 1
 
     return (num_S, num_E, num_I, num_R)
 
@@ -62,10 +59,10 @@ def timestep_one_env(env, step_size, env_size) -> None:
 def main():
     # Constants
     ENVIRONMENT_COUNT = 1
-    AGENT_COUNT_PER_ENV = 500
+    AGENT_COUNT_PER_ENV = 100
     TIMESTEPS = 500
-    ENV_SIZE = 200
-    AGENT_STEP_SIZE = 5
+    ENV_SIZE = 50
+    AGENT_STEP_SIZE = 2
 
     # Initialization
     environment_list = []
@@ -79,12 +76,11 @@ def main():
     for environment in environment_list:
         for _ in range(AGENT_COUNT_PER_ENV):
             environment.append(Agent(pos=(ENV_SIZE*random.random(), ENV_SIZE*random.random())))
-            quarantine(environment, quarantine)
+
     for environment in environment_list:
         initial_infected = r.sample(environment, 10)
         for agent in initial_infected:
-            agent.S = False
-            agent.I = True
+            agent.status = "I"
 
 
 
@@ -96,13 +92,13 @@ def main():
 
 
         for agent in environment_list[0]:
-            if agent.I:
+            if agent.status == "I":
                 pyplot.plot(agent.pos[0], agent.pos[1], "or")
-            if agent.S:
+            if agent.status == "S":
                 pyplot.plot(agent.pos[0], agent.pos[1], "ob")
-            if agent.R:
+            if agent.status == "R":
                 pyplot.plot(agent.pos[0], agent.pos[1], "og")
-            if agent.E:
+            if agent.status == "E":
                 pyplot.plot(agent.pos[0], agent.pos[1], "oy")
 
         pyplot.xlim(0, ENV_SIZE)
