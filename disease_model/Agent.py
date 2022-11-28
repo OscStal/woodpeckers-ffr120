@@ -33,6 +33,7 @@ class Agent():
         self.E = False
         self.I = False
         self.R = False
+        self.Q = False
 
         # Economy related parameters?
         self.resource_amount = 0

@@ -39,14 +39,18 @@ def update_agent_positions_random(env, step_size, pos_limit) -> None:
     for agent in env:
         agent.random_move(pos_limit, step_size)
 
-# Here 'attr' is the string "S", "E", "I" or "R"
-# getattr(agent, var) is essentially the same as agent.var
-def count_status_one_env(env: list, attr: str):
-    num = 0
+def count_status_one_env(env: list):
+    num_I = 0
+    num_S = 0
+    num_E = 0
+    num_R = 0
     for agent in env:
-        if getattr(agent, attr, default_value=False):
-            num = num + 1
-    return num
+        if agent.S: num_S = num_S + 1
+        if agent.E: num_E = num_E + 1
+        if agent.I: num_I = num_I + 1
+        if agent.R: num_R = num_R + 1
+
+    return (num_S, num_E, num_I, num_R)
 
 
 
@@ -75,7 +79,7 @@ def main():
     for environment in environment_list:
         for _ in range(AGENT_COUNT_PER_ENV):
             environment.append(Agent(pos=(ENV_SIZE*random.random(), ENV_SIZE*random.random())))
-
+            quarantine(environment, quarantine)
     for environment in environment_list:
         initial_infected = r.sample(environment, 10)
         for agent in initial_infected:
@@ -89,6 +93,7 @@ def main():
         print(f"step:{t}")
         for environment in environment_list:
             timestep_one_env(environment, AGENT_STEP_SIZE, ENV_SIZE)
+
 
         for agent in environment_list[0]:
             if agent.I:
