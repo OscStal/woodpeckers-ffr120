@@ -59,15 +59,13 @@ def timestep_one_env(env, step_size, env_size) -> None:
 def main():
     # Constants
     ENVIRONMENT_COUNT = 1
-    AGENT_COUNT_PER_ENV = 100
-    TIMESTEPS = 500
-    ENV_SIZE = 50
+    AGENT_COUNT_PER_ENV = 200
+    TIMESTEPS = 100
+    ENV_SIZE = 100
     AGENT_STEP_SIZE = 2
 
     # Initialization
     environment_list = []
-    quarantine = []
-    dead_agents = []
     
     for _ in range(ENVIRONMENT_COUNT):
         empty_environment = []
@@ -81,30 +79,50 @@ def main():
         initial_infected = r.sample(environment, 10)
         for agent in initial_infected:
             agent.status = "I"
+    # End initialization
 
+    # Figure setup
+    fig, (area, graph) = pyplot.subplots(1, 2)
+    # End
 
+    # Testing stuff
+    num_s = np.zeros((TIMESTEPS, ))
+    num_e = np.zeros((TIMESTEPS, ))
+    num_i = np.zeros((TIMESTEPS, ))
+    num_r = np.zeros((TIMESTEPS, ))
 
     for t in range(TIMESTEPS):
-        pyplot.clf()
-        print(f"step:{t}")
+        area.clear()
+        graph.clear()
         for environment in environment_list:
             timestep_one_env(environment, AGENT_STEP_SIZE, ENV_SIZE)
-
+            (ss,ee,ii,rr) = count_status_one_env(environment)
+            num_s[t] = ss
+            num_e[t] = ee
+            num_i[t] = ii
+            num_r[t] = rr
 
         for agent in environment_list[0]:
             if agent.status == "I":
-                pyplot.plot(agent.pos[0], agent.pos[1], "or")
+                area.plot(agent.pos[0], agent.pos[1], "or")
             if agent.status == "S":
-                pyplot.plot(agent.pos[0], agent.pos[1], "ob")
+                area.plot(agent.pos[0], agent.pos[1], "ob")
             if agent.status == "R":
-                pyplot.plot(agent.pos[0], agent.pos[1], "og")
-            if agent.status == "E":
-                pyplot.plot(agent.pos[0], agent.pos[1], "oy")
+                area.plot(agent.pos[0], agent.pos[1], "og")
 
-        pyplot.xlim(0, ENV_SIZE)
-        pyplot.ylim(0, ENV_SIZE)
+        area.set_xlim(0, ENV_SIZE)
+        area.set_ylim(0, ENV_SIZE)
+
+        graph.plot(np.arange(0, t, 1), num_s[:t], label="S")
+        #pyplot.plot(np.arange(0, TIMESTEPS, 1), num_e, label="E")
+        graph.plot(np.arange(0, t, 1), num_i[:t], label="I")
+        graph.plot(np.arange(0, t, 1), num_r[:t], label="R")
+        graph.legend()
+        
+        graph.set_title(f"Timestep: {t}")
         pyplot.pause(0.01)
         pyplot.show(block=False)
+    pyplot.show()
 
 
 
