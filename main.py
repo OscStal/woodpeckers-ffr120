@@ -91,11 +91,14 @@ def main():
     num_r = np.zeros((TIMESTEPS, ))
 
     for t in range(TIMESTEPS):
+        # Clear plots between timesteps
         area.clear()
         graph.clear()
+
         for environment in environment_list:
             timestep_one_env(environment, AGENT_STEP_SIZE, ENV_SIZE)
 
+            # Save S,E,I,R-amount every timestep
             (ss,ee,ii,rr) = count_status_one_env(environment)
             num_s[t] = ss
             num_e[t] = ee
