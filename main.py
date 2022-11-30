@@ -48,14 +48,31 @@ def count_status_one_env(env: list):
 
     return (num_S, num_E, num_I, num_R)
 
-
-
 def timestep_one_env(env, step_size, env_size) -> None:
     update_agent_positions_random(env, step_size, env_size)
     infect_one_env(env)
     recover_one_env(env)
     # Quarantine stuff?
     # Economy stuff?
+
+def create_environment(env_count, agent_per_env, env_size, n_initial_I):
+    environment_list = []
+    
+    for _ in range(env_count):
+        empty_environment = []
+        environment_list.append(empty_environment)
+
+    for environment in environment_list:
+        for _ in range(agent_per_env):
+            environment.append(Agent(pos=(env_size*random.random(), env_size*random.random())))
+
+    for environment in environment_list:
+        if not n_initial_I: break
+        initial_infected = r.sample(environment, n_initial_I)
+        for agent in initial_infected:
+            agent.status = "I"
+
+    return environment_list
 
 def main():
     # Constants
@@ -64,25 +81,10 @@ def main():
     TIMESTEPS = 250
     ENV_SIZE = 100
     AGENT_STEP_SIZE = 2
+    INITIAL_INFECTED_PER_ENV = 10
 
     # Initialization
-    environment_list = []
-    
-    for _ in range(ENVIRONMENT_COUNT):
-        empty_environment = []
-        environment_list.append(empty_environment)
-
-    for environment in environment_list:
-        for _ in range(AGENT_COUNT_PER_ENV):
-            environment.append(Agent(pos=(ENV_SIZE*random.random(), ENV_SIZE*random.random())))
-
-    for environment in environment_list:
-        initial_infected = r.sample(environment, 10)
-        for agent in initial_infected:
-            agent.status = "I"
-    # End initialization
-
-    # Figure setup
+    environment_list = create_environment(ENVIRONMENT_COUNT, AGENT_COUNT_PER_ENV, ENV_SIZE, INITIAL_INFECTED_PER_ENV)
     fig, (area, graph) = pyplot.subplots(1, 2)
     # End
 
