@@ -32,8 +32,8 @@ class Agent():
         self.in_quarantine = False
         self.status = "S"
 
-        # Economy related parameters?
-        self.resource_amount = 0
+        # Economy related parameters
+        self.resources = 0
         self.resource_minimum = 0
         self.cash = 0
         self.salary = 0
@@ -43,4 +43,23 @@ class Agent():
         new_x = (self.pos[0] + (step_size*(random.random()-0.5)))%pos_limit
         new_y = (self.pos[1] + (step_size*(random.random()-0.5)))%pos_limit
         self.pos = (new_x, new_y)
+
+
+    def buy(self, resourceCost):
+        self.cash -= resourceCost 
+        self.resources += 1
+
+    def updateCash(self):
+        self.cash += self.salary/30
+
+    def updateResources(self):
+        self.resources -= 1
+            
+    def update(self):
+        self.updateCash()
+        self.updateResources()
+
+def updateAllAgents(self, allAgents):
+    for agent in allAgents:
+        agent.update()
 
