@@ -89,7 +89,7 @@ def run_simulation(
     ):
 
     environment_list = create_environment(env_count, agent_per_env, env_size, n_init_I)
-    nS,nE,nI,nR = np.zeros((timesteps,)), np.zeros((timesteps,)), np.zeros((timesteps,)), np.zeros((timesteps,))
+    nS,nE,nI,nR,nD = (np.zeros((timesteps,)) for _ in range(5))
 
     for t in range(timesteps):
         print(t)
