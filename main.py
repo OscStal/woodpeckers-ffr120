@@ -54,12 +54,14 @@ def timestep_one_env(env, step_size, env_size) -> None:
     update_agent_positions_random(env, step_size, env_size)
     infect_one_env(env)
     recover_one_env(env)
+    # Quarantine stuff?
+    # Economy stuff?
 
 def main():
     # Constants
     ENVIRONMENT_COUNT = 1
     AGENT_COUNT_PER_ENV = 200
-    TIMESTEPS = 100
+    TIMESTEPS = 250
     ENV_SIZE = 100
     AGENT_STEP_SIZE = 2
 
