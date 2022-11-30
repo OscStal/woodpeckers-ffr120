@@ -12,7 +12,7 @@ import random as r
 
 def infect_one_env(environment: list):
     for agent in environment:
-        if (agent.status == "I") and (random.random() < agent.infect_prob):
+        if (agent.status in "EI") and (random.random() < agent.infect_prob):
             infect_nearby_agents(environment, agent.pos, agent.radius)
 
 def infect_nearby_agents(env, infection_pos, infection_radius):
@@ -128,6 +128,7 @@ def main():
     pyplot.plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("R"), label="R")
     pyplot.legend()
     pyplot.show()
+
 
 
 def test():
