@@ -34,7 +34,7 @@ class Agent():
 
         # Economy related parameters
         self.resources = 0
-        self.resource_minimum = 0
+        self.resource_minimum = 4
         self.cash = 0
         self.salary = 0
 
@@ -58,8 +58,10 @@ class Agent():
     def update(self):
         self.updateCash()
         self.updateResources()
+        if(self.resources<0):
+            self.status = "D"
 
-def updateAllAgents(self, allAgents):
-    for agent in allAgents:
+def updateAllAgents(self, all_agents):
+    for agent in all_agents:
         agent.update()
 
