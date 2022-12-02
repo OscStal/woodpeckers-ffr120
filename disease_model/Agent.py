@@ -8,6 +8,7 @@ class Agent():
     DEFAULT_R_RATE = 0.01
     DEFAULT_E2I_RATE = 0.5
     DEFAULT_D_RATE = 0
+    DEFAULT_STEP_SIZE = 3
 
     def __init__(
         self, 
@@ -16,7 +17,8 @@ class Agent():
         i_rate=DEFAULT_I_RATE,
         r_rate=DEFAULT_R_RATE,
         e2i_rate=DEFAULT_E2I_RATE,
-        d_rate=DEFAULT_D_RATE
+        d_rate=DEFAULT_D_RATE,
+        step_size=DEFAULT_STEP_SIZE
         ) -> None:
 
         # Misc, optional, etc parameters can be added to this dict
@@ -24,6 +26,7 @@ class Agent():
 
         # Disease related paramteres
         self.pos = pos
+        self.step_size = step_size
         self.radius = rad
         self.infect_prob = i_rate   # Probability to infect nearby
         self.e2i_prob = e2i_rate    # Probability to go from exposed to infected

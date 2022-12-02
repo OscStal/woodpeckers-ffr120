@@ -4,6 +4,7 @@ from disease_model.Agent import Agent
 import numpy as np
 from matplotlib import pyplot
 import random as r
+# End
 
 
 
@@ -11,7 +12,7 @@ import random as r
 
 def infect_one_env(environment: list):
     for agent in environment:
-        if (agent.status == "I") and (random.random() < agent.infect_prob):
+        if (agent.status in "EI") and (random.random() < agent.infect_prob):
             infect_nearby_agents(environment, agent.pos, agent.radius)
 
 def infect_nearby_agents(env, infection_pos, infection_radius):
@@ -31,9 +32,9 @@ def recover_one_env(environment: list) -> None:
         if (agent.status == "I") and (random.random() < agent.recover_prob):
             agent.status = "R"
 
-def update_agent_positions_random(env, step_size, pos_limit) -> None:
+def update_agent_positions_random(env, pos_limit) -> None:
     for agent in env:
-        agent.random_move(pos_limit, step_size)
+        agent.random_move(pos_limit, agent.step_size)
 
 def count_status_one_env(env: list):
     num_I = 0
@@ -48,8 +49,8 @@ def count_status_one_env(env: list):
 
     return (num_S, num_E, num_I, num_R)
 
-def timestep_one_env(env, step_size, env_size) -> None:
-    update_agent_positions_random(env, step_size, env_size)
+def timestep_one_env(env, env_size) -> None:
+    update_agent_positions_random(env, env_size)
     infect_one_env(env)
     recover_one_env(env)
     # Quarantine stuff?
@@ -66,21 +67,77 @@ def create_environment(env_count, agent_per_env, env_size, n_initial_I):
         for _ in range(agent_per_env):
             environment.append(Agent(pos=(env_size*random.random(), env_size*random.random())))
 
+    if not n_initial_I: return environment_list
     for environment in environment_list:
-        if not n_initial_I: break
         initial_infected = r.sample(environment, n_initial_I)
         for agent in initial_infected:
             agent.status = "I"
 
     return environment_list
 
+def run_simulation(
+    env_count: int,
+    agent_per_env: int,
+    env_size: int,
+    n_init_I: int,
+    timesteps: int,
+
+    # Kwargs
+    economy_model: object = None,
+    visualize_agents = False
+
+    ):
+
+    environment_list = create_environment(env_count, agent_per_env, env_size, n_init_I)
+    nS,nE,nI,nR,nD = (np.zeros((timesteps,)) for _ in range(5))
+
+    for t in range(timesteps):
+        print(t)
+        for environment in environment_list:
+            timestep_one_env(environment, env_size)
+
+            # Save history of agent statuses across all timesteps
+            (nS[t],nE[t],nI[t],nR[t]) = count_status_one_env(environment)
+
+    return {
+        "status_history": {
+            "S": nS,
+            "E": nE,
+            "I": nI,
+            "R": nR,
+        },
+        "test":"Test"}
+
 def main():
+    ENVIRONMENT_COUNT = 1
+    AGENT_COUNT_PER_ENV = 200
+    TIMESTEPS = 750
+    ENV_SIZE = 100
+    INITIAL_INFECTED_PER_ENV = 10
+
+    outputs: dict = run_simulation(
+        ENVIRONMENT_COUNT,
+        AGENT_COUNT_PER_ENV,
+        ENV_SIZE,
+        INITIAL_INFECTED_PER_ENV,
+        TIMESTEPS,
+        )
+
+    # Plot stuff
+    pyplot.plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("I"), label="I")
+    pyplot.plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("S"), label="E")
+    pyplot.plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("R"), label="R")
+    pyplot.legend()
+    pyplot.show()
+
+
+
+def test_disease():
     # Constants
     ENVIRONMENT_COUNT = 1
     AGENT_COUNT_PER_ENV = 200
-    TIMESTEPS = 250
+    TIMESTEPS = 750
     ENV_SIZE = 100
-    AGENT_STEP_SIZE = 2
     INITIAL_INFECTED_PER_ENV = 10
 
     # Initialization
@@ -95,12 +152,13 @@ def main():
     num_r = np.zeros((TIMESTEPS, ))
 
     for t in range(TIMESTEPS):
+        print(t)
         # Clear plots between timesteps
-        area.clear()
-        graph.clear()
+        # area.clear()
+        # graph.clear()
 
         for environment in environment_list:
-            timestep_one_env(environment, AGENT_STEP_SIZE, ENV_SIZE)
+            timestep_one_env(environment, ENV_SIZE)
 
             # Save S,E,I,R-amount every timestep
             (ss,ee,ii,rr) = count_status_one_env(environment)
@@ -109,26 +167,31 @@ def main():
             num_i[t] = ii
             num_r[t] = rr
 
-        for agent in environment_list[0]:
-            if agent.status == "I":
-                area.plot(agent.pos[0], agent.pos[1], "or")
-            if agent.status == "S":
-                area.plot(agent.pos[0], agent.pos[1], "ob")
-            if agent.status == "R":
-                area.plot(agent.pos[0], agent.pos[1], "og")
+        # for agent in environment_list[0]:
+        #     if agent.status == "I":
+        #         area.plot(agent.pos[0], agent.pos[1], "or")
+        #     if agent.status == "S":
+        #         area.plot(agent.pos[0], agent.pos[1], "ob")
+        #     if agent.status == "R":
+        #         area.plot(agent.pos[0], agent.pos[1], "og")
 
-        area.set_xlim(0, ENV_SIZE)
-        area.set_ylim(0, ENV_SIZE)
+        # area.set_xlim(0, ENV_SIZE)
+        # area.set_ylim(0, ENV_SIZE)
 
-        graph.plot(np.arange(0, t, 1), num_s[:t], label="S")
-        #pyplot.plot(np.arange(0, TIMESTEPS, 1), num_e, label="E")
-        graph.plot(np.arange(0, t, 1), num_i[:t], label="I")
-        graph.plot(np.arange(0, t, 1), num_r[:t], label="R")
-        graph.legend()
+        # graph.plot(np.arange(0, t, 1), num_s[:t], label="S")
+        # #pyplot.plot(np.arange(0, TIMESTEPS, 1), num_e, label="E")
+        # graph.plot(np.arange(0, t, 1), num_i[:t], label="I")
+        # graph.plot(np.arange(0, t, 1), num_r[:t], label="R")
+        # graph.legend()
         
-        graph.set_title(f"Timestep: {t}")
-        pyplot.pause(0.01)
-        pyplot.show(block=False)
+        # graph.set_title(f"Timestep: {t}")
+        # pyplot.pause(0.01)
+        # pyplot.show(block=False)
+    pyplot.plot(np.arange(0, TIMESTEPS, 1), num_s, label="S")
+    #pyplot.plot(np.arange(0, TIMESTEPS, 1), num_e, label="E")
+    pyplot.plot(np.arange(0, TIMESTEPS, 1), num_i, label="I")
+    pyplot.plot(np.arange(0, TIMESTEPS, 1), num_r, label="R")
+    pyplot.legend()
     pyplot.show()
 
 
