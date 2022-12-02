@@ -36,10 +36,11 @@ class Agent():
         self.status = "S"
 
         # Economy related parameters
-        self.resources = 0
+        self.resources = 5
         self.resource_minimum = 4
-        self.cash = 0
-        self.salary = 0
+        self.resource_decrease_rate = 1
+        self.cash = 5
+        self.salary = 1
 
 
     def random_move(self, pos_limit, step_size):
@@ -56,7 +57,7 @@ class Agent():
         self.cash += self.salary/30
 
     def updateResources(self):
-        self.resources -= 1
+        self.resources -= self.resource_decrease_rate
             
     def update(self):
         self.updateCash()
@@ -64,7 +65,7 @@ class Agent():
         if(self.resources<0):
             self.status = "D"
 
-def updateAllAgents(self, all_agents):
+def updateAllAgents(all_agents):
     for agent in all_agents:
         agent.update()
 

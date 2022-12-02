@@ -1,13 +1,12 @@
 # Imports
 import random
 from disease_model.Agent import Agent
+from disease_model.Agent import updateAllAgents
+from disease_model.Store import Store
 import numpy as np
 from matplotlib import pyplot
 import random as r
 # End
-
-
-
 
 
 def infect_one_env(environment: list):
@@ -49,10 +48,13 @@ def count_status_one_env(env: list):
 
     return (num_S, num_E, num_I, num_R)
 
-def timestep_one_env(env, env_size) -> None:
+def timestep_one_env(env, env_size, store) -> None:
+    # env is list of agent objects
     update_agent_positions_random(env, env_size)
     infect_one_env(env)
     recover_one_env(env)
+    store.update(env)
+    updateAllAgents(env)
     # Quarantine stuff?
     # Economy stuff?
 
@@ -91,10 +93,10 @@ def run_simulation(
     environment_list = create_environment(env_count, agent_per_env, env_size, n_init_I)
     nS,nE,nI,nR,nD = (np.zeros((timesteps,)) for _ in range(5))
 
+    store = Store()
     for t in range(timesteps):
-        print(t)
         for environment in environment_list:
-            timestep_one_env(environment, env_size)
+            timestep_one_env(environment, env_size, store)
 
             # Save history of agent statuses across all timesteps
             (nS[t],nE[t],nI[t],nR[t]) = count_status_one_env(environment)
@@ -106,7 +108,9 @@ def run_simulation(
             "I": nI,
             "R": nR,
         },
-        "test":"Test"}
+        "store":{
+            "customers_history": store.customers_history
+        }}
 
 def main():
     ENVIRONMENT_COUNT = 1
@@ -123,14 +127,18 @@ def main():
         timesteps=TIMESTEPS,
         )
 
+    #print("!!! CUSTOMER HISTORY: !!!")
+    #print(outputs.get("store", {}).get("customers_history"))
+
     # Plot stuff
-    pyplot.plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("I"), label="I")
-    pyplot.plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("S"), label="E")
-    pyplot.plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("R"), label="R")
-    pyplot.legend()
+    _, subplots = pyplot.subplots(1, 2)
+    subplots[0].plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("S"), label="S")
+    subplots[0].plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("I"), label="I")
+    subplots[0].plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("R"), label="R")
+    subplots[0].legend()
+    subplots[1].plot(np.arange(0, TIMESTEPS, 1), outputs.get("store", {}).get("customers_history"), label="Customers history")
+    subplots[1].legend()
     pyplot.show()
-
-
 
 def test_disease():
     # Constants
