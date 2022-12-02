@@ -41,11 +41,13 @@ def count_status_one_env(env: list):
     num_S = 0
     num_E = 0
     num_R = 0
+    num_D = 0
     for agent in env:
-        if agent.status == "S": num_S = num_S + 1
-        if agent.status == "E": num_E = num_E + 1
-        if agent.status == "I": num_I = num_I + 1
-        if agent.status == "R": num_R = num_R + 1
+        if agent.status == "S": num_S += 1
+        if agent.status == "E": num_E += 1
+        if agent.status == "I": num_I += 1
+        if agent.status == "R": num_R += 1
+        if agent.status == "D": num_D += 1
 
     return (num_S, num_E, num_I, num_R)
 
@@ -113,7 +115,7 @@ def main():
     AGENT_COUNT_PER_ENV = 200
     TIMESTEPS = 750
     ENV_SIZE = 100
-    INITIAL_INFECTED_PER_ENV = 1
+    INITIAL_INFECTED_PER_ENV = 0
 
     outputs: dict = run_simulation(
         env_count=ENVIRONMENT_COUNT,
@@ -125,7 +127,7 @@ def main():
 
     # Plot stuff
     pyplot.plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("I"), label="I")
-    pyplot.plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("S"), label="E")
+    pyplot.plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("S"), label="S")
     pyplot.plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("R"), label="R")
     pyplot.legend()
     pyplot.show()
