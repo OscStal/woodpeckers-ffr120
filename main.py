@@ -113,14 +113,14 @@ def main():
     AGENT_COUNT_PER_ENV = 200
     TIMESTEPS = 750
     ENV_SIZE = 100
-    INITIAL_INFECTED_PER_ENV = 10
+    INITIAL_INFECTED_PER_ENV = 1
 
     outputs: dict = run_simulation(
-        ENVIRONMENT_COUNT,
-        AGENT_COUNT_PER_ENV,
-        ENV_SIZE,
-        INITIAL_INFECTED_PER_ENV,
-        TIMESTEPS,
+        env_count=ENVIRONMENT_COUNT,
+        agent_per_env=AGENT_COUNT_PER_ENV,
+        env_size=ENV_SIZE,
+        n_init_I=INITIAL_INFECTED_PER_ENV,
+        timesteps=TIMESTEPS,
         )
 
     # Plot stuff
