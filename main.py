@@ -123,6 +123,7 @@ def main():
         TIMESTEPS,
         )
 
+    # Plot stuff
     pyplot.plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("I"), label="I")
     pyplot.plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("S"), label="E")
     pyplot.plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("R"), label="R")
@@ -131,7 +132,7 @@ def main():
 
 
 
-def test():
+def test_disease():
     # Constants
     ENVIRONMENT_COUNT = 1
     AGENT_COUNT_PER_ENV = 200
