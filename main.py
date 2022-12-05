@@ -143,8 +143,8 @@ def main():
     subplots[0].plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("D"), label="Dead")
     subplots[0].legend()
     subplots[1].set_xlabel("Time")
-    subplots[1].set_ylabel("Number of agents visiting the store")
-    subplots[1].plot(np.arange(0, TIMESTEPS, 1), outputs.get("store", {}).get("customers_history"), label="Customers history")
+    subplots[1].set_ylabel("Number of agents visiting the store per day")
+    subplots[1].plot(np.arange(0, TIMESTEPS, 1), outputs.get("store", {}).get("customers_history"), label="Customers per day")
     subplots[1].legend()
     pyplot.show()
 

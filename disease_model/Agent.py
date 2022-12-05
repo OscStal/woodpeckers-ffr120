@@ -38,9 +38,9 @@ class Agent():
         # Economy related parameters
         self.resources = 5
         self.resource_minimum = 4
-        self.resource_decrease_rate = 1
+        self.daily_resource_decrease_rate = 1
         self.cash = 5
-        self.salary = 1
+        self.daily_salary = 1
 
 
     def random_move(self, pos_limit, step_size):
@@ -54,10 +54,10 @@ class Agent():
         self.resources += 1
 
     def updateCash(self):
-        self.cash += self.salary/30
+        self.cash += self.daily_salary
 
     def updateResources(self):
-        self.resources -= self.resource_decrease_rate
+        self.resources -= self.daily_resource_decrease_rate
             
     def update(self):
         self.updateCash()
