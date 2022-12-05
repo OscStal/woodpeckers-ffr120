@@ -12,8 +12,7 @@ class Store():
     def update(self, all_agents: list):
         self.number_of_customers = 0
         for agent in all_agents:
-            print(agent)
-            if agent.cash >= self.resource_cost:
+            if agent.status != "D" and agent.cash >= self.resource_cost and agent.resources < agent.resource_minimum:
                 agent.buy(self.resource_cost)
                 self.number_of_customers += 1
             else:

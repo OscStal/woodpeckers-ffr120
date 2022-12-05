@@ -48,7 +48,7 @@ def count_status_one_env(env: list):
         if agent.status == "R": num_R += 1
         if agent.status == "D": num_D += 1
 
-    return (num_S, num_E, num_I, num_R)
+    return (num_S, num_E, num_I, num_R, num_D)
 
 def timestep_one_env(env, env_size, store) -> None:
     # env is list of agent objects
@@ -101,7 +101,7 @@ def run_simulation(
             timestep_one_env(environment, env_size, store)
 
             # Save history of agent statuses across all timesteps
-            (nS[t],nE[t],nI[t],nR[t]) = count_status_one_env(environment)
+            (nS[t],nE[t],nI[t],nR[t],nD[t]) = count_status_one_env(environment)
 
     return {
         "status_history": {
@@ -109,6 +109,7 @@ def run_simulation(
             "E": nE,
             "I": nI,
             "R": nR,
+            "D": nD,
         },
         "store":{
             "customers_history": store.customers_history
@@ -134,10 +135,15 @@ def main():
 
     # Plot stuff
     _, subplots = pyplot.subplots(1, 2)
-    subplots[0].plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("S"), label="S")
-    subplots[0].plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("I"), label="I")
-    subplots[0].plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("R"), label="R")
+    subplots[0].set_xlabel("Time")
+    subplots[0].set_ylabel("Number of agents in the environment")
+    subplots[0].plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("S"), label="Susceptible (Healthy)")
+    #subplots[0].plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("I"), label="I")
+    #subplots[0].plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("R"), label="R")
+    subplots[0].plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("D"), label="Dead")
     subplots[0].legend()
+    subplots[1].set_xlabel("Time")
+    subplots[1].set_ylabel("Number of agents visiting the store")
     subplots[1].plot(np.arange(0, TIMESTEPS, 1), outputs.get("store", {}).get("customers_history"), label="Customers history")
     subplots[1].legend()
     pyplot.show()
