@@ -36,11 +36,11 @@ class Agent():
         self.status = "S"
 
         # Economy related parameters
-        self.resources = 5
+        self.resources = (random.random() + 1)
         self.resource_minimum = 4
         self.daily_resource_decrease_rate = 1
-        self.cash = 5
-        self.daily_salary = 1
+        self.cash = (random.random() + 5)
+        self.daily_salary = (random.random() + 0.9)
 
 
     def random_move(self, pos_limit, step_size):

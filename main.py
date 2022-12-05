@@ -138,6 +138,9 @@ def main():
     subplots[0].set_xlabel("Time")
     subplots[0].set_ylabel("Number of agents in the environment")
     subplots[0].plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("S"), label="Susceptible (Healthy)")
+    n_alive = outputs.get("status_history", {}).get("S")[-1]
+    alive_annotation = "Alive: " + str(n_alive/AGENT_COUNT_PER_ENV * 100) + "%"
+    subplots[0].annotate(alive_annotation, xy=(TIMESTEPS, outputs.get("status_history", {}).get("S")[-1]))
     #subplots[0].plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("I"), label="I")
     #subplots[0].plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("R"), label="R")
     subplots[0].plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("D"), label="Dead")
