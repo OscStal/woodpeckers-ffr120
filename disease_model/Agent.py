@@ -1,9 +1,10 @@
 import random
+import numpy as np
 
 class Agent():
 
     DEFAULT_POS = (0, 0)
-    DEFAULT_RADIUS = 4
+    DEFAULT_RADIUS = 2
     DEFAULT_I_RATE = 0.9
     DEFAULT_R_RATE = 0.01
     DEFAULT_E2I_RATE = 0.5
@@ -36,11 +37,11 @@ class Agent():
         self.status = "S"
 
         # Economy related parameters
-        self.resources = (random.random() + 1)
-        self.resource_minimum = 4
-        self.daily_resource_decrease_rate = 1
-        self.cash = (random.random() + 5)
-        self.daily_salary = (random.random() + 0.9)
+        self.resources = np.random.normal(8,0.5)
+        self.resource_minimum = 5
+        self.daily_resource_decrease_rate = np.random.normal(0.2,0.01)
+        self.cash = (np.random.normal(5,0.5))
+        self.daily_salary = np.random.normal(2,0.2)
 
 
     def random_move(self, pos_limit, step_size):
@@ -51,7 +52,7 @@ class Agent():
 
     def buy(self, resourceCost):
         self.cash -= resourceCost 
-        self.resources += 1
+        self.resources = np.random.normal(8,1)
 
     def updateCash(self):
         self.cash += self.daily_salary

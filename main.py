@@ -51,14 +51,11 @@ def count_status_one_env(env: list):
     return (num_S, num_E, num_I, num_R, num_D)
 
 def timestep_one_env(env, env_size, store) -> None:
-    # env is list of agent objects
+    # env is list of the "Agent" object
     update_agent_positions_random(env, env_size)
     infect_one_env(env)
     recover_one_env(env)
     store.update(env)
-    updateAllAgents(env)
-    # Quarantine stuff?
-    # Economy stuff?
 
 def create_environment(env_count, agent_per_env, env_size, n_initial_I):
     environment_list = []
@@ -117,7 +114,7 @@ def run_simulation(
 
 def main():
     ENVIRONMENT_COUNT = 1
-    AGENT_COUNT_PER_ENV = 200
+    AGENT_COUNT_PER_ENV = 120
     TIMESTEPS = 750
     ENV_SIZE = 100
     INITIAL_INFECTED_PER_ENV = 0
@@ -130,26 +127,27 @@ def main():
         timesteps=TIMESTEPS,
         )
 
-    #print("!!! CUSTOMER HISTORY: !!!")
-    #print(outputs.get("store", {}).get("customers_history"))
 
     # Plot stuff
-    _, subplots = pyplot.subplots(1, 2)
+    fig, subplots = pyplot.subplots(1, 2)
     subplots[0].set_xlabel("Time")
     subplots[0].set_ylabel("Number of agents in the environment")
     subplots[0].plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("S"), label="Susceptible (Healthy)")
     n_alive = outputs.get("status_history", {}).get("S")[-1]
     alive_annotation = "Alive: " + str(n_alive/AGENT_COUNT_PER_ENV * 100) + "%"
     subplots[0].annotate(alive_annotation, xy=(TIMESTEPS, outputs.get("status_history", {}).get("S")[-1]))
-    #subplots[0].plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("I"), label="I")
-    #subplots[0].plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("R"), label="R")
+    subplots[0].plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("I"), label="I")
+    subplots[0].plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("R"), label="R")
     subplots[0].plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("D"), label="Dead")
     subplots[0].legend()
+    
     subplots[1].set_xlabel("Time")
     subplots[1].set_ylabel("Number of agents visiting the store per day")
     subplots[1].plot(np.arange(0, TIMESTEPS, 1), outputs.get("store", {}).get("customers_history"), label="Customers per day")
     subplots[1].legend()
     pyplot.show()
+
+
 
 def test_disease():
     # Constants

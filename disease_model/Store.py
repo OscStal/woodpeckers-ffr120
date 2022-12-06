@@ -1,4 +1,5 @@
 import random
+from disease_model.Agent import updateAllAgents
 
 class Store():
     DEFAULT_NUMBER_OF_CUSTOMERS = 0
@@ -12,9 +13,11 @@ class Store():
     def update(self, all_agents: list):
         self.number_of_customers = 0
         for agent in all_agents:
-            if agent.status != "D" and agent.cash >= self.resource_cost and agent.resources < agent.resource_minimum:
+            if (agent.status not in "ID") and (agent.cash >= self.resource_cost) and (agent.resources < agent.resource_minimum):
                 agent.buy(self.resource_cost)
                 self.number_of_customers += 1
             else:
                 continue
         self.customers_history.append(self.number_of_customers)
+    
+        updateAllAgents(all_agents)
