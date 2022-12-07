@@ -181,7 +181,7 @@ def main2():
     NUM_POINTS = 20
 
     avg_list = np.zeros((NUM_POINTS,))
-    for idx, i in enumerate(np.linspace(0, 1, NUM_POINTS)):
+    for idx, varying in enumerate(np.linspace(0, 1, NUM_POINTS)):
         print(idx)
 
         for _ in range(4):
@@ -191,9 +191,9 @@ def main2():
                 env_size=ENV_SIZE,
                 n_init_I=INITIAL_INFECTED_PER_ENV,
                 timesteps=TIMESTEPS,
-                infection_radius=INFECTION_RADIUS,
-                infection_rate = INFECTION_RATE,
-                recovery_rate = RECOVERY_RATE,
+                infection_radius=varying,
+                infection_rate=INFECTION_RATE,
+                recovery_rate=RECOVERY_RATE,
                 # Add paramters here and in run_simulation as done for these above if other parameters need to be varied
                 )
 
