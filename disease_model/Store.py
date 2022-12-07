@@ -3,7 +3,7 @@ from disease_model.Agent import updateAllAgents
 
 class Store():
     DEFAULT_NUMBER_OF_CUSTOMERS = 0
-    DEFAULT_COST_OF_RESOURCE = 1
+    DEFAULT_COST_OF_RESOURCE = 2
     
     def __init__(self) -> None:
         self.resource_cost = self.DEFAULT_COST_OF_RESOURCE

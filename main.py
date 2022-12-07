@@ -31,6 +31,11 @@ def recover_one_env(environment: list) -> None:
         if (agent.status == "I") and (random.random() < agent.recover_prob):
             agent.status = "R"
 
+def kill_one_env(env: list):
+    for agent in env:
+        if (agent.status == "I") and (random.random() < agent.death_prob):
+            agent.status == "D"
+
 def update_agent_positions_random(env, pos_limit) -> None:
     for agent in env:
         agent.random_move(pos_limit, agent.step_size)
@@ -55,6 +60,7 @@ def timestep_one_env(env, env_size, store) -> None:
     update_agent_positions_random(env, env_size)
     infect_one_env(env)
     recover_one_env(env)
+    kill_one_env(env)
     store.update(env)
 
 def create_environment(env_count, agent_per_env, env_size, n_initial_I):
@@ -76,21 +82,24 @@ def create_environment(env_count, agent_per_env, env_size, n_initial_I):
 
     return environment_list
 
+def avg_customers(customer_history: list):
+    return np.average(customer_history)
+
 def run_simulation(
     env_count: int,
     agent_per_env: int,
     env_size: int,
     n_init_I: int,
     timesteps: int,
-
-    # Kwargs
-    economy_model: object = None,
-    visualize_agents = False
-
+    infection_radius: int
     ):
 
     environment_list = create_environment(env_count, agent_per_env, env_size, n_init_I)
     nS,nE,nI,nR,nD = (np.zeros((timesteps,)) for _ in range(5))
+
+    for env in environment_list:
+        for agent in env:
+            agent.radius = infection_radius
 
     store = Store()
     for t in range(timesteps):
@@ -100,24 +109,31 @@ def run_simulation(
             # Save history of agent statuses across all timesteps
             (nS[t],nE[t],nI[t],nR[t],nD[t]) = count_status_one_env(environment)
 
+        if (t > 20) and (nE[t-20] == 0) and (nI[t-20] == 0):
+            # Stop simulation once noone is infected/exposed?
+            break
+                
+
     return {
+        "t_steps" : t,
         "status_history": {
-            "S": nS,
-            "E": nE,
-            "I": nI,
-            "R": nR,
-            "D": nD,
+            "S": nS[:t],
+            "E": nE[:t],
+            "I": nI[:t],
+            "R": nR[:t],
+            "D": nD[:t],
         },
         "store":{
-            "customers_history": store.customers_history
+            "customers_history": store.customers_history[:t]
         }}
 
 def main():
     ENVIRONMENT_COUNT = 1
-    AGENT_COUNT_PER_ENV = 120
-    TIMESTEPS = 750
-    ENV_SIZE = 100
-    INITIAL_INFECTED_PER_ENV = 0
+    AGENT_COUNT_PER_ENV = 250
+    TIMESTEPS = 250
+    ENV_SIZE = 200
+    INITIAL_INFECTED_PER_ENV = 20
+
 
     outputs: dict = run_simulation(
         env_count=ENVIRONMENT_COUNT,
@@ -125,27 +141,57 @@ def main():
         env_size=ENV_SIZE,
         n_init_I=INITIAL_INFECTED_PER_ENV,
         timesteps=TIMESTEPS,
+        infection_radius=4
         )
 
 
     # Plot stuff
-    fig, subplots = pyplot.subplots(1, 2)
+    fig, subplots = pyplot.subplots(1, 3)
     subplots[0].set_xlabel("Time")
     subplots[0].set_ylabel("Number of agents in the environment")
-    subplots[0].plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("S"), label="Susceptible (Healthy)")
+    subplots[0].plot(np.arange(0, outputs.get("t_steps"), 1), outputs.get("status_history", {}).get("S"), label="Susceptible (Healthy)")
     n_alive = outputs.get("status_history", {}).get("S")[-1]
     alive_annotation = "Alive: " + str(n_alive/AGENT_COUNT_PER_ENV * 100) + "%"
-    subplots[0].annotate(alive_annotation, xy=(TIMESTEPS, outputs.get("status_history", {}).get("S")[-1]))
-    subplots[0].plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("I"), label="I")
-    subplots[0].plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("R"), label="R")
-    subplots[0].plot(np.arange(0, TIMESTEPS, 1), outputs.get("status_history", {}).get("D"), label="Dead")
+    subplots[0].annotate(alive_annotation, xy=(outputs.get("t_steps"), outputs.get("status_history", {}).get("S")[-1]))
+    subplots[0].plot(np.arange(0, outputs.get("t_steps"), 1), outputs.get("status_history", {}).get("I"), label="I")
+    subplots[0].plot(np.arange(0, outputs.get("t_steps"), 1), outputs.get("status_history", {}).get("R"), label="R")
+    subplots[0].plot(np.arange(0, outputs.get("t_steps"), 1), outputs.get("status_history", {}).get("D"), label="Dead")
     subplots[0].legend()
     
     subplots[1].set_xlabel("Time")
     subplots[1].set_ylabel("Number of agents visiting the store per day")
-    subplots[1].plot(np.arange(0, TIMESTEPS, 1), outputs.get("store", {}).get("customers_history"), label="Customers per day")
+    subplots[1].plot(np.arange(0, outputs.get("t_steps"), 1), outputs.get("store", {}).get("customers_history"), label="Customers per day")
     subplots[1].legend()
     pyplot.show()
+
+def main2():
+    ENVIRONMENT_COUNT = 1
+    AGENT_COUNT_PER_ENV = 250
+    TIMESTEPS = 250
+    ENV_SIZE = 200
+    INITIAL_INFECTED_PER_ENV = 20
+
+    avg_list = np.zeros((16,))
+    for i in range(1, 17):
+        print(i)
+        for _ in range(5):
+            outputs: dict = run_simulation(
+                env_count=ENVIRONMENT_COUNT,
+                agent_per_env=AGENT_COUNT_PER_ENV,
+                env_size=ENV_SIZE,
+                n_init_I=INITIAL_INFECTED_PER_ENV,
+                timesteps=TIMESTEPS,
+                infection_radius=i
+                )
+            avg_list[i-1] += avg_customers(outputs.get("store", {}).get("customers_history"))
+        avg_list[i-1] = avg_list[i]/5
+    
+    pyplot.plot(range(1,17), avg_list, "ob")
+    pyplot.xlabel("Infection Radius")
+    pyplot.ylabel("Avg. Customers over a simulation")
+    pyplot.show()
+        
+
 
 
 
@@ -215,4 +261,4 @@ def test_disease():
 
 
 if __name__ == "__main__": 
-    main()
+    main2()
