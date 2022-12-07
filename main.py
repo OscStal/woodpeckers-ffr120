@@ -91,7 +91,9 @@ def run_simulation(
     env_size: int,
     n_init_I: int,
     timesteps: int,
-    infection_radius: int
+    infection_radius: int,
+    infection_rate: float,
+    recovery_rate: float
     ):
 
     environment_list = create_environment(env_count, agent_per_env, env_size, n_init_I)
@@ -100,6 +102,8 @@ def run_simulation(
     for env in environment_list:
         for agent in env:
             agent.radius = infection_radius
+            agent.infect_prob = infection_rate
+            agent.recovery_prob = recovery_rate
 
     store = Store()
     for t in range(timesteps):
@@ -170,24 +174,34 @@ def main2():
     TIMESTEPS = 250
     ENV_SIZE = 200
     INITIAL_INFECTED_PER_ENV = 20
+    INFECTION_RADIUS = 4
+    INFECTION_RATE = 0.8
+    RECOVERY_RATE = 0.01
 
-    avg_list = np.zeros((16,))
-    for i in range(1, 17):
-        print(i)
-        for _ in range(5):
+    NUM_POINTS = 20
+
+    avg_list = np.zeros((NUM_POINTS,))
+    for idx, i in enumerate(np.linspace(0, 1, NUM_POINTS)):
+        print(idx)
+
+        for _ in range(4):
             outputs: dict = run_simulation(
                 env_count=ENVIRONMENT_COUNT,
                 agent_per_env=AGENT_COUNT_PER_ENV,
                 env_size=ENV_SIZE,
                 n_init_I=INITIAL_INFECTED_PER_ENV,
                 timesteps=TIMESTEPS,
-                infection_radius=i
+                infection_radius=INFECTION_RADIUS,
+                infection_rate = INFECTION_RATE,
+                recovery_rate = RECOVERY_RATE,
+                # Add paramters here and in run_simulation as done for these above if other parameters need to be varied
                 )
-            avg_list[i-1] += avg_customers(outputs.get("store", {}).get("customers_history"))
-        avg_list[i-1] = avg_list[i-1]/5
+
+            avg_list[idx] += avg_customers(outputs.get("store", {}).get("customers_history"))
+        avg_list[idx] = avg_list[idx]/5
     
-    pyplot.plot(range(1,17), avg_list, "ob")
-    pyplot.xlabel("Infection Radius")
+    pyplot.plot(np.linspace(0, 1, NUM_POINTS), avg_list, "ob")
+    pyplot.xlabel("Infection Probability")
     pyplot.ylabel("Avg. Customers over a simulation")
     pyplot.show()
         
