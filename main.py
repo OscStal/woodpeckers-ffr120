@@ -184,7 +184,7 @@ def main2():
                 infection_radius=i
                 )
             avg_list[i-1] += avg_customers(outputs.get("store", {}).get("customers_history"))
-        avg_list[i-1] = avg_list[i]/5
+        avg_list[i-1] = avg_list[i-1]/5
     
     pyplot.plot(range(1,17), avg_list, "ob")
     pyplot.xlabel("Infection Radius")
