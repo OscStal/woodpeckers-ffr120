@@ -85,6 +85,13 @@ def create_environment(env_count, agent_per_env, env_size, n_initial_I):
 def avg_customers(customer_history: list):
     return np.average(customer_history)
 
+def get_resource_cash_distribution(env: list):
+    resources = [agent.resources for agent in env]
+    cash = [agent.cash for agent in env]
+    return (resources, cash)
+
+
+
 def run_simulation(
     env_count: int,
     agent_per_env: int,
@@ -116,7 +123,13 @@ def run_simulation(
         if (t > 20) and (nE[t-20] == 0) and (nI[t-20] == 0):
             # Stop simulation once noone is infected/exposed?
             break
-                
+
+    # Calculate average per 5 timesteps of store activity  
+    ch = store.customers_history[:t]
+    t_avg_history = []
+    for i in range(len(ch)):
+        if i%5==0 and i>0:
+            t_avg_history.append(np.average(ch[i-5:i]))
 
     return {
         "t_steps" : t,
@@ -128,7 +141,9 @@ def run_simulation(
             "D": nD[:t],
         },
         "store":{
-            "customers_history": store.customers_history[:t]
+            "customers_history": store.customers_history[:t],
+            "customer_history_averaged": t_avg_history,
+            "customer_history_averaged_len": len(t_avg_history)
         }}
 
 def main():
@@ -136,7 +151,7 @@ def main():
     AGENT_COUNT_PER_ENV = 250
     TIMESTEPS = 250
     ENV_SIZE = 200
-    INITIAL_INFECTED_PER_ENV = 20
+    INITIAL_INFECTED_PER_ENV = 5
 
 
     outputs: dict = run_simulation(
@@ -145,16 +160,18 @@ def main():
         env_size=ENV_SIZE,
         n_init_I=INITIAL_INFECTED_PER_ENV,
         timesteps=TIMESTEPS,
-        infection_radius=4
+        infection_radius=12,
+        infection_rate=Agent.DEFAULT_I_RATE,
+        recovery_rate=Agent.DEFAULT_R_RATE
         )
 
 
     # Plot stuff
-    fig, subplots = pyplot.subplots(1, 3)
+    fig, subplots = pyplot.subplots(1, 2)
     subplots[0].set_xlabel("Time")
     subplots[0].set_ylabel("Number of agents in the environment")
     subplots[0].plot(np.arange(0, outputs.get("t_steps"), 1), outputs.get("status_history", {}).get("S"), label="Susceptible (Healthy)")
-    n_alive = outputs.get("status_history", {}).get("S")[-1]
+    n_alive = outputs.get("status_history", {}).get("S")[-1] + outputs.get("status_history", {}).get("R")[-1]
     alive_annotation = "Alive: " + str(n_alive/AGENT_COUNT_PER_ENV * 100) + "%"
     subplots[0].annotate(alive_annotation, xy=(outputs.get("t_steps"), outputs.get("status_history", {}).get("S")[-1]))
     subplots[0].plot(np.arange(0, outputs.get("t_steps"), 1), outputs.get("status_history", {}).get("I"), label="I")
@@ -162,9 +179,10 @@ def main():
     subplots[0].plot(np.arange(0, outputs.get("t_steps"), 1), outputs.get("status_history", {}).get("D"), label="Dead")
     subplots[0].legend()
     
-    subplots[1].set_xlabel("Time")
+    subplots[1].set_xlabel("Average 5 timesteps")
     subplots[1].set_ylabel("Number of agents visiting the store per day")
-    subplots[1].plot(np.arange(0, outputs.get("t_steps"), 1), outputs.get("store", {}).get("customers_history"), label="Customers per day")
+    #subplots[1].plot(np.arange(0, outputs.get("t_steps"), 1), outputs.get("store", {}).get("customers_history"), label="Customers per day")
+    subplots[1].plot(np.arange(0, outputs.get("store", {}).get("customer_history_averaged_len"), 1), outputs.get("store", {}).get("customer_history_averaged"), label="Customers per day")
     subplots[1].legend()
     pyplot.show()
 
@@ -178,13 +196,16 @@ def main2():
     INFECTION_RATE = 0.8
     RECOVERY_RATE = 0.01
 
-    NUM_POINTS = 20
+    NUM_POINTS = 19
+    POINT_AVG = 5
+    x_axis = range(1,20)
+    NUM_POINTS = len(x_axis)
 
     avg_list = np.zeros((NUM_POINTS,))
-    for idx, varying in enumerate(np.linspace(0, 1, NUM_POINTS)):
+    for idx, varying in enumerate(x_axis):
         print(idx)
 
-        for _ in range(4):
+        for _ in range(POINT_AVG):
             outputs: dict = run_simulation(
                 env_count=ENVIRONMENT_COUNT,
                 agent_per_env=AGENT_COUNT_PER_ENV,
@@ -198,9 +219,9 @@ def main2():
                 )
 
             avg_list[idx] += avg_customers(outputs.get("store", {}).get("customers_history"))
-        avg_list[idx] = avg_list[idx]/5
+        avg_list[idx] = avg_list[idx]/POINT_AVG
     
-    pyplot.plot(np.linspace(0, 1, NUM_POINTS), avg_list, "ob")
+    pyplot.plot(x_axis, avg_list, "ob")
     pyplot.xlabel("Infection Probability")
     pyplot.ylabel("Avg. Customers over a simulation")
     pyplot.show()
@@ -275,4 +296,4 @@ def test_disease():
 
 
 if __name__ == "__main__": 
-    main2()
+    main()
