@@ -139,8 +139,8 @@ def run_simulation(
         "t_steps" : t,
         "max_infected_num" : get_max_EI(nE, nI),
         "max_infected_percent" : get_max_EI(nE, nI)/agent_per_env,
-        "alive_at_end_num" : (nR[-1] + nS[-1]),
-        "alive_at_end_percent" : (nR[-1] + nS[-1])/agent_per_env,
+        "alive_at_end_num" : (nR[t-1] + nS[t-1]),
+        "alive_at_end_percent" : (nR[t-1] + nS[t-1])/agent_per_env,
         "status_history": {
             "S": nS[:t],
             "E": nE[:t],
@@ -174,7 +174,7 @@ def main():
         env_size=ENV_SIZE,
         n_init_I=INITIAL_INFECTED_PER_ENV,
         timesteps=TIMESTEPS,
-        infection_radius=7,
+        infection_radius=15,
         infection_rate=Agent.DEFAULT_I_RATE,
         recovery_rate=Agent.DEFAULT_R_RATE
         )
@@ -212,16 +212,25 @@ def main2():
     INFECTION_RATE = Agent.DEFAULT_I_RATE
     RECOVERY_RATE = Agent.DEFAULT_R_RATE
 
-    NUM_POINTS = 19
-    POINT_AVG = 5
-    x_axis = range(1,20)
-    NUM_POINTS = len(x_axis)
+    POINT_AVG = 8
+    X1_AXIS = range(12,16)
+    X1_POINTS = len(X1_AXIS)
 
-    avg_list = np.zeros((NUM_POINTS,))
-    for idx, varying in enumerate(x_axis):
-        print(idx)
+    fig, axs1 = pyplot.subplots()
+    axs2 = axs1.twinx()
+    axs3 = axs1.twinx()
+    axs4 = axs1.twinx()
 
+    avg1_list = np.zeros((X1_POINTS,))
+    avg2_list = np.zeros((X1_POINTS,))
+    avg3_list = np.zeros((X1_POINTS,))
+    avg4_list = np.zeros((X1_POINTS,))
+
+
+    for idx, varying in enumerate(X1_AXIS):
+        print(f"{idx+1} of {X1_POINTS}")
         for _ in range(POINT_AVG):
+            
             outputs: dict = run_simulation(
                 env_count=ENVIRONMENT_COUNT,
                 agent_per_env=AGENT_COUNT_PER_ENV,
@@ -234,12 +243,36 @@ def main2():
                 # Add paramters here and in run_simulation as done for these above if other parameters need to be varied
                 )
 
-            avg_list[idx] += avg_customers(outputs.get("store", {}).get("customers_history"))
-        avg_list[idx] = avg_list[idx]/POINT_AVG
+            avg1_list[idx] += avg_customers(outputs.get("store", {}).get("customers_history"))
+            avg2_list[idx] += outputs.get("alive_at_end_percent")
+            avg3_list[idx] += outputs.get("max_infected_percent")
+            avg4_list[idx] += outputs.get("t_steps")
+        avg1_list[idx] = avg1_list[idx]/POINT_AVG
+        avg2_list[idx] = avg2_list[idx]/POINT_AVG
+        avg3_list[idx] = avg3_list[idx]/POINT_AVG
+        avg4_list[idx] = avg4_list[idx]/POINT_AVG
     
-    pyplot.plot(x_axis, avg_list, "ob")
-    pyplot.xlabel("Infection Probability")
-    pyplot.ylabel("Avg. Customers over a simulation")
+
+    axs1.plot(X1_AXIS, avg1_list, "o-", color="tab:blue")
+    axs1.set_xlabel("Infection Radius")
+    axs1.set_ylabel("Averageg customers over a simulation", color="tab:blue")
+    #axs1.tick_params(axis='y', labelcolor="tab:blue")
+
+    axs2.plot(X1_AXIS, avg2_list, "s-", color="tab:red")
+    axs2.set_ylabel("Percent alive at end of simulation", color="tab:red")
+    #axs2.tick_params(axis='y', labelcolor="tab:red")
+
+    axs3.plot(X1_AXIS, avg3_list, "^-", color="tab:green")
+    axs3.set_ylabel("Max percent of population infected", color="tab:green")
+    #axs3.tick_params(axis='y', labelcolor="tab:green")
+    axs3.spines['right'].set_position(('outward', 50))
+
+    axs4.plot(X1_AXIS, avg4_list, "H-", color="tab:brown")
+    axs4.set_ylabel("Timesteps until disease gone", color="tab:brown")
+    #axs4.tick_params(axis='y', labelcolor="tab:brown")
+    axs4.spines['right'].set_position(('outward', 100))
+
+    fig.tight_layout()
     pyplot.show()
         
 
@@ -312,4 +345,4 @@ def test_disease():
 
 
 if __name__ == "__main__": 
-    main()
+    main2()
