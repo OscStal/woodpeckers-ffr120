@@ -107,6 +107,7 @@ def run_simulation(
 
     environment_list = create_environment(env_count, agent_per_env, env_size, n_init_I)
     nS,nE,nI,nR,nD = (np.zeros((timesteps,)) for _ in range(5))
+    resources, cash = np.zeros((timesteps,), dtype=list), np.zeros((timesteps,), dtype=list)
 
     for env in environment_list:
         for agent in env:
@@ -121,6 +122,7 @@ def run_simulation(
 
             # Save history of agent statuses across all timesteps
             (nS[t],nE[t],nI[t],nR[t],nD[t]) = count_status_one_env(environment)
+            resources[t], cash[t] = get_resource_cash_distribution(environment)
 
         if (t > 20) and (nE[t-20] == 0) and (nI[t-20] == 0):
             # Stop simulation once noone is infected/exposed?
@@ -130,8 +132,8 @@ def run_simulation(
     ch = store.customers_history[:t]
     t_avg_history = []
     for i in range(len(ch)):
-        if i%5==0 and i>0:
-            t_avg_history.append(np.average(ch[i-5:i]))
+        if i%10==0 and i>0:
+            t_avg_history.append(np.average(ch[i-10:i]))
 
     return {
         "t_steps" : t,
@@ -145,13 +147,16 @@ def run_simulation(
             "I": nI[:t],
             "R": nR[:t],
             "D": nD[:t],
+            "resources" : resources,
+            "cash" : cash,
         },
         "store":{
             "customers_history": store.customers_history[:t],
             "customer_history_averaged": t_avg_history,
             "customer_history_averaged_len": len(t_avg_history),
             "avg_customers" : avg_customers(store.customers_history[:t]),
-        }}
+        },
+        }
 
 
 
@@ -169,7 +174,7 @@ def main():
         env_size=ENV_SIZE,
         n_init_I=INITIAL_INFECTED_PER_ENV,
         timesteps=TIMESTEPS,
-        infection_radius=4,
+        infection_radius=7,
         infection_rate=Agent.DEFAULT_I_RATE,
         recovery_rate=Agent.DEFAULT_R_RATE
         )
@@ -191,7 +196,7 @@ def main():
     subplots[1].set_xlabel("Time")
     subplots[1].set_ylabel("Number of agents visiting the store per 5 timesteps")
     #subplots[1].plot(np.arange(0, outputs.get("t_steps"), 1), outputs.get("store", {}).get("customers_history"), label="Customers per day")
-    subplots[1].plot(np.arange(0, outputs.get("store", {}).get("customer_history_averaged_len")*5, 5), outputs.get("store", {}).get("customer_history_averaged"), label="Customers per day")
+    subplots[1].plot(np.arange(0, outputs.get("store", {}).get("customer_history_averaged_len")*10, 10), outputs.get("store", {}).get("customer_history_averaged"), label="Customers per day")
     subplots[1].legend()
     pyplot.show()
 
