@@ -216,6 +216,8 @@ def main2():
     X1_AXIS = range(12,16)
     X1_POINTS = len(X1_AXIS)
 
+    # https://stackoverflow.com/questions/9103166/multiple-axis-in-matplotlib-with-different-scales
+    # https://matplotlib.org/3.1.0/gallery/subplots_axes_and_figures/two_scales.html
     fig, axs1 = pyplot.subplots()
     axs2 = axs1.twinx()
     axs3 = axs1.twinx()
@@ -230,7 +232,7 @@ def main2():
     for idx, varying in enumerate(X1_AXIS):
         print(f"{idx+1} of {X1_POINTS}")
         for _ in range(POINT_AVG):
-            
+
             outputs: dict = run_simulation(
                 env_count=ENVIRONMENT_COUNT,
                 agent_per_env=AGENT_COUNT_PER_ENV,
