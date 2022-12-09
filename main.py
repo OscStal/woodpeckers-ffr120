@@ -25,7 +25,6 @@ def infect_nearby_agents(env, infection_pos, infection_radius):
         if (agent.status == "E") and (r.random() < agent.e2i_prob):
             agent.status = "I"
 
-
 def recover_one_env(environment: list) -> None:
     for agent in environment:
         if (agent.status == "I") and (random.random() < agent.recover_prob):
@@ -90,6 +89,9 @@ def get_resource_cash_distribution(env: list):
     cash = [agent.cash for agent in env]
     return (resources, cash)
 
+def get_max_EI(nE,nI):
+    return np.max(nE+nI)
+
 
 
 def run_simulation(
@@ -133,6 +135,10 @@ def run_simulation(
 
     return {
         "t_steps" : t,
+        "max_infected_num" : get_max_EI(nE, nI),
+        "max_infected_percent" : get_max_EI(nE, nI)/agent_per_env,
+        "alive_at_end_num" : (nR[-1] + nS[-1]),
+        "alive_at_end_percent" : (nR[-1] + nS[-1])/agent_per_env,
         "status_history": {
             "S": nS[:t],
             "E": nE[:t],
@@ -143,14 +149,17 @@ def run_simulation(
         "store":{
             "customers_history": store.customers_history[:t],
             "customer_history_averaged": t_avg_history,
-            "customer_history_averaged_len": len(t_avg_history)
+            "customer_history_averaged_len": len(t_avg_history),
+            "avg_customers" : avg_customers(store.customers_history[:t]),
         }}
+
+
 
 def main():
     ENVIRONMENT_COUNT = 1
     AGENT_COUNT_PER_ENV = 250
-    TIMESTEPS = 250
-    ENV_SIZE = 200
+    TIMESTEPS = 2000
+    ENV_SIZE = 150
     INITIAL_INFECTED_PER_ENV = 5
 
 
@@ -160,7 +169,7 @@ def main():
         env_size=ENV_SIZE,
         n_init_I=INITIAL_INFECTED_PER_ENV,
         timesteps=TIMESTEPS,
-        infection_radius=12,
+        infection_radius=4,
         infection_rate=Agent.DEFAULT_I_RATE,
         recovery_rate=Agent.DEFAULT_R_RATE
         )
@@ -172,19 +181,21 @@ def main():
     subplots[0].set_ylabel("Number of agents in the environment")
     subplots[0].plot(np.arange(0, outputs.get("t_steps"), 1), outputs.get("status_history", {}).get("S"), label="Susceptible (Healthy)")
     n_alive = outputs.get("status_history", {}).get("S")[-1] + outputs.get("status_history", {}).get("R")[-1]
-    alive_annotation = "Alive: " + str(n_alive/AGENT_COUNT_PER_ENV * 100) + "%"
+    alive_annotation = "Total Alive (S+R): " + str(n_alive/AGENT_COUNT_PER_ENV * 100) + "%"
     subplots[0].annotate(alive_annotation, xy=(outputs.get("t_steps"), outputs.get("status_history", {}).get("S")[-1]))
     subplots[0].plot(np.arange(0, outputs.get("t_steps"), 1), outputs.get("status_history", {}).get("I"), label="I")
     subplots[0].plot(np.arange(0, outputs.get("t_steps"), 1), outputs.get("status_history", {}).get("R"), label="R")
     subplots[0].plot(np.arange(0, outputs.get("t_steps"), 1), outputs.get("status_history", {}).get("D"), label="Dead")
     subplots[0].legend()
     
-    subplots[1].set_xlabel("Average 5 timesteps")
-    subplots[1].set_ylabel("Number of agents visiting the store per day")
+    subplots[1].set_xlabel("Time")
+    subplots[1].set_ylabel("Number of agents visiting the store per 5 timesteps")
     #subplots[1].plot(np.arange(0, outputs.get("t_steps"), 1), outputs.get("store", {}).get("customers_history"), label="Customers per day")
-    subplots[1].plot(np.arange(0, outputs.get("store", {}).get("customer_history_averaged_len"), 1), outputs.get("store", {}).get("customer_history_averaged"), label="Customers per day")
+    subplots[1].plot(np.arange(0, outputs.get("store", {}).get("customer_history_averaged_len")*5, 5), outputs.get("store", {}).get("customer_history_averaged"), label="Customers per day")
     subplots[1].legend()
     pyplot.show()
+
+
 
 def main2():
     ENVIRONMENT_COUNT = 1
@@ -193,8 +204,8 @@ def main2():
     ENV_SIZE = 200
     INITIAL_INFECTED_PER_ENV = 20
     INFECTION_RADIUS = 4
-    INFECTION_RATE = 0.8
-    RECOVERY_RATE = 0.01
+    INFECTION_RATE = Agent.DEFAULT_I_RATE
+    RECOVERY_RATE = Agent.DEFAULT_R_RATE
 
     NUM_POINTS = 19
     POINT_AVG = 5
