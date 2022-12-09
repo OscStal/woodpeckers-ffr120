@@ -102,7 +102,8 @@ def run_simulation(
     timesteps: int,
     infection_radius: int,
     infection_rate: float,
-    recovery_rate: float
+    recovery_rate: float,
+    d_rate: float
     ):
 
     environment_list = create_environment(env_count, agent_per_env, env_size, n_init_I)
@@ -206,13 +207,19 @@ def main2():
     INFECTION_RADIUS = 4
     INFECTION_RATE = Agent.DEFAULT_I_RATE
     RECOVERY_RATE = Agent.DEFAULT_R_RATE
+    d_rate = Agent.DEFAULT_D_RATE;
 
-    NUM_POINTS = 19
+    NUM_POINTS = 10
     POINT_AVG = 5
-    x_axis = range(1,20)
+    #x_axis = range(1,NUM_POINTS+1)
+    x_axis = np.linspace(0,1,10)
     NUM_POINTS = len(x_axis)
 
-    avg_list = np.zeros((NUM_POINTS,))
+    avg_list_tot_alive = np.zeros((NUM_POINTS,))
+    avg_list_maxIE = np.zeros((NUM_POINTS,))
+    avg_list_duration = np.zeros((NUM_POINTS,))
+    avg_list_Comstumers = np.zeros((NUM_POINTS,))
+    
     for idx, varying in enumerate(x_axis):
         print(idx)
 
@@ -223,19 +230,34 @@ def main2():
                 env_size=ENV_SIZE,
                 n_init_I=INITIAL_INFECTED_PER_ENV,
                 timesteps=TIMESTEPS,
-                infection_radius=varying,
+                infection_radius=INFECTION_RADIUS,
                 infection_rate=INFECTION_RATE,
                 recovery_rate=RECOVERY_RATE,
+                d_rate = varying 
                 # Add paramters here and in run_simulation as done for these above if other parameters need to be varied
                 )
 
-            avg_list[idx] += avg_customers(outputs.get("store", {}).get("customers_history"))
-        avg_list[idx] = avg_list[idx]/POINT_AVG
+            #avg_list[idx] += avg_customers(outputs.get("store", {}).get("customers_history"))
+            avg_list_tot_alive[idx] += outputs.get("alive_at_end_num")
+            avg_list_maxIE[idx] += outputs.get("max_infected_num")
+            avg_list_duration[idx] += outputs.get("t_steps")
+            avg_list_Comstumers[idx] += avg_customers(outputs.get("store", {}).get("customers_history"))
+
+        avg_list_tot_alive[idx] = avg_list_tot_alive[idx]/POINT_AVG
+        avg_list_maxIE[idx] = avg_list_maxIE[idx]/POINT_AVG
+        avg_list_duration[idx] = avg_list_duration[idx]/POINT_AVG
+        avg_list_Comstumers[idx] = avg_list_Comstumers[idx]/POINT_AVG
     
-    pyplot.plot(x_axis, avg_list, "ob")
-    pyplot.xlabel("Infection Probability")
-    pyplot.ylabel("Avg. Customers over a simulation")
-    pyplot.show()
+    print(x_axis)
+    print(avg_list_tot_alive)
+    print(avg_list_maxIE)
+    print(avg_list_duration)
+    print(avg_list_Comstumers)
+
+    #pyplot.plot(x_axis, avg_list_duration, "ob")
+    #pyplot.xlabel("Infection radius")
+    #pyplot.ylabel("Duration of the pandemic")
+    #pyplot.show()
         
 
 
@@ -307,4 +329,4 @@ def test_disease():
 
 
 if __name__ == "__main__": 
-    main()
+    main2()
