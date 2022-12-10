@@ -204,16 +204,16 @@ def main():
 
 def main2():
     ENVIRONMENT_COUNT = 1
-    AGENT_COUNT_PER_ENV = 250
+    AGENT_COUNT_PER_ENV = 500
     TIMESTEPS = 250
-    ENV_SIZE = 200
-    INITIAL_INFECTED_PER_ENV = 20
+    ENV_SIZE = 250
+    INITIAL_INFECTED_PER_ENV = 40
     INFECTION_RADIUS = 4
     INFECTION_RATE = Agent.DEFAULT_I_RATE
     RECOVERY_RATE = Agent.DEFAULT_R_RATE
 
     POINT_AVG = 8
-    X1_AXIS = range(12,16)
+    X1_AXIS = range(0,4)
     X1_POINTS = len(X1_AXIS)
 
     # https://stackoverflow.com/questions/9103166/multiple-axis-in-matplotlib-with-different-scales
@@ -257,7 +257,7 @@ def main2():
 
     axs1.plot(X1_AXIS, avg1_list, "o-", color="tab:blue")
     axs1.set_xlabel("Infection Radius")
-    axs1.set_ylabel("Averageg customers over a simulation", color="tab:blue")
+    axs1.set_ylabel("Average customers over an entire simulation", color="tab:blue")
     #axs1.tick_params(axis='y', labelcolor="tab:blue")
 
     axs2.plot(X1_AXIS, avg2_list, "s-", color="tab:red")
@@ -273,6 +273,10 @@ def main2():
     axs4.set_ylabel("Timesteps until disease gone", color="tab:brown")
     #axs4.tick_params(axis='y', labelcolor="tab:brown")
     axs4.spines['right'].set_position(('outward', 100))
+
+    print(f"Avg.customers entire simulation: {avg1_list}")
+    print(f"% alive end of simulation: {[100*v for v in avg3_list]}%")
+    print(f"Max % infected during simulation: {[100*v for v in avg3_list]}%")
 
     fig.tight_layout()
     pyplot.show()
