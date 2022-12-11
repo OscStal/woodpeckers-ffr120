@@ -54,13 +54,13 @@ def count_status_one_env(env: list):
 
     return (num_S, num_E, num_I, num_R, num_D)
 
-def timestep_one_env(env, env_size, store) -> None:
+def timestep_one_env(env, env_size, store, ca_perc) -> None:
     # env is list of the "Agent" object
     update_agent_positions_random(env, env_size)
     infect_one_env(env)
     recover_one_env(env)
     kill_one_env(env)
-    store.update(env)
+    store.update(env, ca_perc)
 
 def create_environment(env_count, agent_per_env, env_size, n_initial_I):
     environment_list = []
@@ -102,7 +102,8 @@ def run_simulation(
     timesteps: int,
     infection_radius: int,
     infection_rate: float,
-    recovery_rate: float
+    recovery_rate: float,
+    cash_assist_percentage: float
     ):
 
     environment_list = create_environment(env_count, agent_per_env, env_size, n_init_I)
@@ -118,7 +119,7 @@ def run_simulation(
     store = Store()
     for t in range(timesteps):
         for environment in environment_list:
-            timestep_one_env(environment, env_size, store)
+            timestep_one_env(environment, env_size, store, cash_assist_percentage)
 
             # Save history of agent statuses across all timesteps
             (nS[t],nE[t],nI[t],nR[t],nD[t]) = count_status_one_env(environment)
@@ -132,8 +133,8 @@ def run_simulation(
     ch = store.customers_history[:t]
     t_avg_history = []
     for i in range(len(ch)):
-        if i%10==0 and i>0:
-            t_avg_history.append(np.average(ch[i-10:i]))
+        if i%5==0 and i>0:
+            t_avg_history.append(np.average(ch[i-5:i]))
 
     return {
         "t_steps" : t,
@@ -162,10 +163,10 @@ def run_simulation(
 
 def main():
     ENVIRONMENT_COUNT = 1
-    AGENT_COUNT_PER_ENV = 250
+    AGENT_COUNT_PER_ENV = 500
     TIMESTEPS = 2000
-    ENV_SIZE = 150
-    INITIAL_INFECTED_PER_ENV = 5
+    ENV_SIZE = 250
+    INITIAL_INFECTED_PER_ENV = 40
 
 
     outputs: dict = run_simulation(
@@ -174,9 +175,10 @@ def main():
         env_size=ENV_SIZE,
         n_init_I=INITIAL_INFECTED_PER_ENV,
         timesteps=TIMESTEPS,
-        infection_radius=15,
+        infection_radius=6,
         infection_rate=Agent.DEFAULT_I_RATE,
-        recovery_rate=Agent.DEFAULT_R_RATE
+        recovery_rate=Agent.DEFAULT_R_RATE,
+        cash_assist_percentage=0
         )
 
 
@@ -205,7 +207,7 @@ def main():
 def main2():
     ENVIRONMENT_COUNT = 1
     AGENT_COUNT_PER_ENV = 500
-    TIMESTEPS = 250
+    TIMESTEPS = 2000
     ENV_SIZE = 250
     INITIAL_INFECTED_PER_ENV = 40
     INFECTION_RADIUS = 4
@@ -351,4 +353,4 @@ def test_disease():
 
 
 if __name__ == "__main__": 
-    main2()
+    main()

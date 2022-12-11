@@ -10,7 +10,7 @@ class Store():
         self.customers = 0
         self.customers_history = []
 
-    def update(self, all_agents: list):
+    def update(self, all_agents: list, ca_perc):
         self.number_of_customers = 0
         for agent in all_agents:
             if (agent.status not in "ID") and (agent.cash >= self.resource_cost) and (agent.resources < agent.resource_minimum):
@@ -20,4 +20,4 @@ class Store():
                 continue
         self.customers_history.append(self.number_of_customers)
     
-        updateAllAgents(all_agents)
+        updateAllAgents(all_agents, ca_perc)

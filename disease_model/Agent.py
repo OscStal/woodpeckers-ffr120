@@ -57,6 +57,9 @@ class Agent():
         nItemsPurchased = random.randint(1, int(self.cash / resourceCost))
         self.resources += nItemsPurchased
         self.cash -= resourceCost * nItemsPurchased
+    
+    def cash_assist(self, assist_percentage):
+        self.cash += self.daily_salary * assist_percentage
 
     def updateCash(self):
         self.cash += self.daily_salary
@@ -64,13 +67,18 @@ class Agent():
     def updateResources(self):
         self.resources -= self.daily_resource_decrease_rate
             
-    def update(self):
-        self.updateCash()
+    def update(self, ca_perc):
+        if self.status != "I":
+            self.updateCash()
+        else:
+            self.cash_assist(ca_perc)
+
         self.updateResources()
-        if(self.resources<0):
+        if(self.resources < 0):
             self.status = "D"
 
-def updateAllAgents(all_agents):
+def updateAllAgents(all_agents, ca_perc):
     for agent in all_agents:
-        agent.update()
+        if agent.status != "D":
+            agent.update(ca_perc)
 
