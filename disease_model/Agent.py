@@ -68,7 +68,7 @@ class Agent():
         self.resources -= self.daily_resource_decrease_rate
             
     def update(self, ca_perc):
-        if self.status != "I":
+        if self.status not in "EI":
             self.updateCash()
         else:
             self.cash_assist(ca_perc)

@@ -175,7 +175,7 @@ def main():
         env_size=ENV_SIZE,
         n_init_I=INITIAL_INFECTED_PER_ENV,
         timesteps=TIMESTEPS,
-        infection_radius=6,
+        infection_radius=5,
         infection_rate=Agent.DEFAULT_I_RATE,
         recovery_rate=Agent.DEFAULT_R_RATE,
         cash_assist_percentage=0
@@ -210,7 +210,7 @@ def main2():
     TIMESTEPS = 2000
     ENV_SIZE = 250
     INITIAL_INFECTED_PER_ENV = 40
-    INFECTION_RADIUS = 4
+    INFECTION_RADIUS = 5
     INFECTION_RATE = Agent.DEFAULT_I_RATE
     RECOVERY_RATE = Agent.DEFAULT_R_RATE
 
@@ -241,9 +241,10 @@ def main2():
                 env_size=ENV_SIZE,
                 n_init_I=INITIAL_INFECTED_PER_ENV,
                 timesteps=TIMESTEPS,
-                infection_radius=varying,
+                infection_radius=INFECTION_RADIUS,
                 infection_rate=INFECTION_RATE,
                 recovery_rate=RECOVERY_RATE,
+                cash_assist_percentage=varying
                 # Add paramters here and in run_simulation as done for these above if other parameters need to be varied
                 )
 
