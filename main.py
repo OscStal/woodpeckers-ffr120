@@ -124,7 +124,7 @@ def run_simulation(
             (nS[t],nE[t],nI[t],nR[t],nD[t]) = count_status_one_env(environment)
             resources[t], cash[t] = get_resource_cash_distribution(environment)
 
-        if (t > 20) and (nE[t-20] == 0) and (nI[t-20] == 0):
+        if (t > 20) and (nE[t-20] == 0):# and (nI[t-20] == 0):
             # Stop simulation once noone is infected/exposed?
             break
 
@@ -291,9 +291,63 @@ def main2():
     fig.tight_layout()
     pyplot.show()
         
+def main_without_pandemic():
+    ENVIRONMENT_COUNT = 1
+    AGENT_COUNT_PER_ENV = 500
+    TIMESTEPS = 250
+    ENV_SIZE = 250
+    INITIAL_INFECTED_PER_ENV = 40
+    INFECTION_RADIUS = Agent.DEFAULT_RADIUS
+    INFECTION_RATE = Agent.DEFAULT_I_RATE
+    RECOVERY_RATE = Agent.DEFAULT_R_RATE
+
+    POINT_AVG = 8
+    X1_AXIS = range(0,21)
+    X1_POINTS = len(X1_AXIS)
+
+    outputs: dict = run_simulation(
+        env_count=ENVIRONMENT_COUNT,
+        agent_per_env=AGENT_COUNT_PER_ENV,
+        env_size=ENV_SIZE,
+        n_init_I=INITIAL_INFECTED_PER_ENV,
+        timesteps=TIMESTEPS,
+        infection_radius=INFECTION_RADIUS,
+        infection_rate=INFECTION_RATE,
+        recovery_rate=RECOVERY_RATE,
+        # Add paramters here and in run_simulation as done for these above if other parameters need to be varied
+        )
+
+    # Plot stuff
+    fig, subplots = pyplot.subplots(1, 4)
+    subplots[0].set_xlabel("Time")
+    subplots[0].set_ylabel("Number of agents in the environment")
+    subplots[0].plot(np.arange(0, outputs.get("t_steps"), 1), outputs.get("status_history", {}).get("S"), label="Susceptible (Healthy)")
+    #n_alive = outputs.get("status_history", {}).get("S")[-1] + outputs.get("status_history", {}).get("R")[-1]
+    #alive_annotation = "Total Alive (S+R): " + str(n_alive/AGENT_COUNT_PER_ENV * 100) + "%"
+    #subplots[0].annotate(alive_annotation, xy=(outputs.get("t_steps"), outputs.get("status_history", {}).get("S")[-1]))
+    subplots[0].plot(np.arange(0, outputs.get("t_steps"), 1), outputs.get("status_history", {}).get("I"), label="I")
+    subplots[0].plot(np.arange(0, outputs.get("t_steps"), 1), outputs.get("status_history", {}).get("R"), label="R")
+    subplots[0].plot(np.arange(0, outputs.get("t_steps"), 1), outputs.get("status_history", {}).get("D"), label="Dead")
+    subplots[0].legend()
+    
+    subplots[1].set_xlabel("Time")
+    subplots[1].set_ylabel("Number of agents visiting the store per 5 timesteps")
+    #subplots[1].plot(np.arange(0, outputs.get("t_steps"), 1), outputs.get("store", {}).get("customers_history"), label="Customers per day")
+    subplots[1].plot(np.arange(0, outputs.get("store", {}).get("customer_history_averaged_len")*10, 10), outputs.get("store", {}).get("customer_history_averaged"), label="Customers per day")
+    subplots[1].legend()
 
 
+    cash = outputs.get("status_history", {}).get("cash")
+    resources = outputs.get("status_history", {}).get("resources")
+    
+    subplots[2].hist(cash[0], color = "lightblue", ec="black", alpha=0.5, label="Initial Cash")
+    subplots[2].hist(cash[-1], color = "moccasin", ec="black", alpha=0.5, label="Final Cash")
+    subplots[2].legend()
 
+    subplots[3].hist(resources[0], color = "lightblue", ec="black", alpha=0.5, label="Initial Resources")
+    subplots[3].hist(resources[-1], color = "moccasin", ec="black", alpha=0.5, label="Final Resources")
+    subplots[3].legend()
+    pyplot.show()
 
 def test_disease():
     # Constants
@@ -361,4 +415,4 @@ def test_disease():
 
 
 if __name__ == "__main__": 
-    main2()
+    main_without_pandemic()
