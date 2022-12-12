@@ -72,5 +72,6 @@ class Agent():
 
 def updateAllAgents(all_agents):
     for agent in all_agents:
-        agent.update()
+        if agent.status != "D":
+            agent.update()
 

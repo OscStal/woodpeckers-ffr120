@@ -85,8 +85,8 @@ def avg_customers(customer_history: list):
     return np.average(customer_history)
 
 def get_resource_cash_distribution(env: list):
-    resources = [agent.resources for agent in env]
-    cash = [agent.cash for agent in env]
+    resources = [agent.resources for agent in env if agent.status != "D"]
+    cash = [agent.cash for agent in env if agent.status != "D"]
     return (resources, cash)
 
 def get_max_EI(nE,nI):
@@ -147,8 +147,8 @@ def run_simulation(
             "I": nI[:t],
             "R": nR[:t],
             "D": nD[:t],
-            "resources" : resources,
-            "cash" : cash,
+            "resources" : resources[0:t],
+            "cash" : cash[0:t],
         },
         "store":{
             "customers_history": store.customers_history[:t],
@@ -156,7 +156,7 @@ def run_simulation(
             "customer_history_averaged_len": len(t_avg_history),
             "avg_customers" : avg_customers(store.customers_history[:t]),
         },
-        }
+    }
 
 
 
@@ -181,7 +181,7 @@ def main():
 
 
     # Plot stuff
-    fig, subplots = pyplot.subplots(1, 2)
+    fig, subplots = pyplot.subplots(1, 4)
     subplots[0].set_xlabel("Time")
     subplots[0].set_ylabel("Number of agents in the environment")
     subplots[0].plot(np.arange(0, outputs.get("t_steps"), 1), outputs.get("status_history", {}).get("S"), label="Susceptible (Healthy)")
@@ -198,6 +198,16 @@ def main():
     #subplots[1].plot(np.arange(0, outputs.get("t_steps"), 1), outputs.get("store", {}).get("customers_history"), label="Customers per day")
     subplots[1].plot(np.arange(0, outputs.get("store", {}).get("customer_history_averaged_len")*10, 10), outputs.get("store", {}).get("customer_history_averaged"), label="Customers per day")
     subplots[1].legend()
+
+
+    cash = outputs.get("status_history", {}).get("cash")
+    resources = outputs.get("status_history", {}).get("resources")
+    
+    #subplots[2].hist(resources[0], label="Personal Resources ditribution before the pandemic")
+    #subplots[3].hist(resources[-1], label="Personal Resources distribution after the pandemic")
+
+    subplots[2].hist(cash[0], label="Personal Cash distribution before the pandemic")
+    subplots[3].hist(cash[-1], label="Personal Cash distribution after the pandemic")
     pyplot.show()
 
 
