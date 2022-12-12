@@ -118,15 +118,16 @@ def run_simulation(
     store = Store()
     for t in range(timesteps):
         for environment in environment_list:
-            timestep_one_env(environment, env_size, store)
 
             # Save history of agent statuses across all timesteps
             (nS[t],nE[t],nI[t],nR[t],nD[t]) = count_status_one_env(environment)
             resources[t], cash[t] = get_resource_cash_distribution(environment)
 
-        if (t > 20) and (nE[t-20] == 0):# and (nI[t-20] == 0):
-            # Stop simulation once noone is infected/exposed?
-            break
+            timestep_one_env(environment, env_size, store)
+
+        # if (t > 20) and (nE[t-20] == 0) and (nI[t-20] == 0):
+        #     # Stop simulation once noone is infected/exposed?
+        #     break
 
     # Calculate average per 5 timesteps of store activity  
     ch = store.customers_history[:t]
@@ -217,7 +218,7 @@ def main2():
     AGENT_COUNT_PER_ENV = 500
     TIMESTEPS = 250
     ENV_SIZE = 250
-    INITIAL_INFECTED_PER_ENV = 40
+    INITIAL_INFECTED_PER_ENV = 0
     INFECTION_RADIUS = Agent.DEFAULT_RADIUS
     INFECTION_RATE = Agent.DEFAULT_I_RATE
     RECOVERY_RATE = Agent.DEFAULT_R_RATE
@@ -296,7 +297,7 @@ def main_without_pandemic():
     AGENT_COUNT_PER_ENV = 500
     TIMESTEPS = 250
     ENV_SIZE = 250
-    INITIAL_INFECTED_PER_ENV = 40
+    INITIAL_INFECTED_PER_ENV = 0
     INFECTION_RADIUS = Agent.DEFAULT_RADIUS
     INFECTION_RATE = Agent.DEFAULT_I_RATE
     RECOVERY_RATE = Agent.DEFAULT_R_RATE
@@ -316,6 +317,7 @@ def main_without_pandemic():
         recovery_rate=RECOVERY_RATE,
         # Add paramters here and in run_simulation as done for these above if other parameters need to be varied
         )
+    #print("Timesteps: ", outputs.get("t_steps"))
 
     # Plot stuff
     fig, subplots = pyplot.subplots(1, 4)
@@ -342,11 +344,14 @@ def main_without_pandemic():
     
     subplots[2].hist(cash[0], color = "lightblue", ec="black", alpha=0.5, label="Initial Cash")
     subplots[2].hist(cash[-1], color = "moccasin", ec="black", alpha=0.5, label="Final Cash")
+    subplots[2].set_title('Cash Distribution')
     subplots[2].legend()
 
     subplots[3].hist(resources[0], color = "lightblue", ec="black", alpha=0.5, label="Initial Resources")
     subplots[3].hist(resources[-1], color = "moccasin", ec="black", alpha=0.5, label="Final Resources")
+    subplots[3].set_title('Resources Distribution')
     subplots[3].legend()
+
     pyplot.show()
 
 def test_disease():
