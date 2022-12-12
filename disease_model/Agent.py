@@ -11,6 +11,13 @@ class Agent():
     DEFAULT_D_RATE = 0
     DEFAULT_STEP_SIZE = 2.5
 
+    # economy parameters that we can control
+    MEAN_SALARY = 1
+    MEAN_RESOURCE_REDUCTION_RATE = 0.2
+    MEAN_INITIAL_CASH = 5
+    MEAN_INITIAL_RESOURCES = 8
+    MINIMUM_RESOURCES = 5
+
     def __init__(
         self, 
         pos=DEFAULT_POS, 
@@ -37,11 +44,11 @@ class Agent():
         self.status = "S"
 
         # Economy related parameters
-        self.resources = np.random.normal(8, 0.5)
-        self.resource_minimum = 5
-        self.daily_resource_decrease_rate = np.random.normal(0.2, 0.01)
-        self.cash = (np.random.normal(5, 0.5))
-        self.daily_salary = np.random.normal(1, 0.1)
+        self.resources = np.random.normal(self.MEAN_INITIAL_RESOURCES, 0.5)
+        self.resource_minimum = self.MINIMUM_RESOURCES
+        self.daily_resource_decrease_rate = np.random.normal(self.MEAN_RESOURCE_REDUCTION_RATE, 0.01)
+        self.cash = (np.random.normal(self.MEAN_INITIAL_CASH, 0.5))
+        self.daily_salary = np.random.normal(self.MEAN_SALARY, 0.1)
 
 
     def random_move(self, pos_limit, step_size):

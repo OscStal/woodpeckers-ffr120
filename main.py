@@ -345,11 +345,44 @@ def main_without_pandemic():
     subplots[2].hist(cash[0], color = "lightblue", ec="black", alpha=0.5, label="Initial Cash")
     subplots[2].hist(cash[-1], color = "moccasin", ec="black", alpha=0.5, label="Final Cash")
     subplots[2].set_title('Cash Distribution')
+    mean_salary_annotation = "Mean daliy salary: " + str(Agent.MEAN_SALARY)
+    subplots[2].annotate(mean_salary_annotation,
+                  xy=(Agent.MEAN_SALARY,0), xycoords='data',
+                  xytext=(Agent.MEAN_SALARY,-10), textcoords='data',
+                  size=5, va="center", ha="center",
+                  bbox=dict(boxstyle="round4", fc="w"),
+                  arrowprops=dict(arrowstyle="-|>",
+                                  connectionstyle="arc3,rad=-0.2",
+                                  fc="w"),
+                  )
     subplots[2].legend()
 
     subplots[3].hist(resources[0], color = "lightblue", ec="black", alpha=0.5, label="Initial Resources")
     subplots[3].hist(resources[-1], color = "moccasin", ec="black", alpha=0.5, label="Final Resources")
     subplots[3].set_title('Resources Distribution')
+
+    minimum_resources_annotation = "Minimum resources to visit store: " + str(Agent.MINIMUM_RESOURCES)
+    subplots[3].annotate(minimum_resources_annotation,
+                  xy=(Agent.MINIMUM_RESOURCES,0), xycoords='data',
+                  xytext=(Agent.MINIMUM_RESOURCES,-20), textcoords='data',
+                  size=5, va="center", ha="center",
+                  bbox=dict(boxstyle="round4", fc="w"),
+                  arrowprops=dict(arrowstyle="-|>",
+                                  connectionstyle="arc3,rad=-0.2",
+                                  fc="w"),
+                  )
+
+    mean_resource_reduction_rate_annotation = "Mean daily resource reduction rate: " + str(Agent.MEAN_RESOURCE_REDUCTION_RATE)
+    subplots[3].annotate(mean_resource_reduction_rate_annotation,
+                  xy=(Agent.MEAN_RESOURCE_REDUCTION_RATE,0), xycoords='data',
+                  xytext=(Agent.MEAN_RESOURCE_REDUCTION_RATE,-10), textcoords='data',
+                  size=5, va="center", ha="center",
+                  bbox=dict(boxstyle="round4", fc="w"),
+                  arrowprops=dict(arrowstyle="-|>",
+                                  connectionstyle="arc3,rad=-0.2",
+                                  fc="w"),
+                  )
+
     subplots[3].legend()
 
     pyplot.show()
