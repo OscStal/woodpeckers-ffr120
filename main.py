@@ -215,72 +215,40 @@ def main2():
     RECOVERY_RATE = Agent.DEFAULT_R_RATE
 
     POINT_AVG = 8
-    X1_AXIS = range(0,4)
+    X1_AXIS = [0, 0.3, 0.6, 0.9]
     X1_POINTS = len(X1_AXIS)
 
     # https://stackoverflow.com/questions/9103166/multiple-axis-in-matplotlib-with-different-scales
     # https://matplotlib.org/3.1.0/gallery/subplots_axes_and_figures/two_scales.html
     fig, axs1 = pyplot.subplots()
-    axs2 = axs1.twinx()
-    axs3 = axs1.twinx()
-    axs4 = axs1.twinx()
 
-    avg1_list = np.zeros((X1_POINTS,))
-    avg2_list = np.zeros((X1_POINTS,))
-    avg3_list = np.zeros((X1_POINTS,))
-    avg4_list = np.zeros((X1_POINTS,))
+    avg1_list = np.zeros((X1_POINTS,), dtype=list)
 
 
     for idx, varying in enumerate(X1_AXIS):
         print(f"{idx+1} of {X1_POINTS}")
-        for _ in range(POINT_AVG):
 
-            outputs: dict = run_simulation(
-                env_count=ENVIRONMENT_COUNT,
-                agent_per_env=AGENT_COUNT_PER_ENV,
-                env_size=ENV_SIZE,
-                n_init_I=INITIAL_INFECTED_PER_ENV,
-                timesteps=TIMESTEPS,
-                infection_radius=INFECTION_RADIUS,
-                infection_rate=INFECTION_RATE,
-                recovery_rate=RECOVERY_RATE,
-                cash_assist_percentage=varying
-                # Add paramters here and in run_simulation as done for these above if other parameters need to be varied
-                )
+        outputs: dict = run_simulation(
+            env_count=ENVIRONMENT_COUNT,
+            agent_per_env=AGENT_COUNT_PER_ENV,
+            env_size=ENV_SIZE,
+            n_init_I=INITIAL_INFECTED_PER_ENV,
+            timesteps=TIMESTEPS,
+            infection_radius=INFECTION_RADIUS,
+            infection_rate=INFECTION_RATE,
+            recovery_rate=RECOVERY_RATE,
+            cash_assist_percentage=varying
+            # Add paramters here and in run_simulation as done for these above if other parameters need to be varied
+            )
 
-            avg1_list[idx] += avg_customers(outputs.get("store", {}).get("customers_history"))
-            avg2_list[idx] += outputs.get("alive_at_end_percent")
-            avg3_list[idx] += outputs.get("max_infected_percent")
-            avg4_list[idx] += outputs.get("t_steps")
-        avg1_list[idx] = avg1_list[idx]/POINT_AVG
-        avg2_list[idx] = avg2_list[idx]/POINT_AVG
-        avg3_list[idx] = avg3_list[idx]/POINT_AVG
-        avg4_list[idx] = avg4_list[idx]/POINT_AVG
-    
 
-    axs1.plot(X1_AXIS, avg1_list, "o-", color="tab:blue")
-    axs1.set_xlabel("Infection Radius")
-    axs1.set_ylabel("Average customers over an entire simulation", color="tab:blue")
-    #axs1.tick_params(axis='y', labelcolor="tab:blue")
 
-    axs2.plot(X1_AXIS, avg2_list, "s-", color="tab:red")
-    axs2.set_ylabel("Percent alive at end of simulation", color="tab:red")
-    #axs2.tick_params(axis='y', labelcolor="tab:red")
+        y_axis = outputs.get("store").get("customer_history_averaged")
+        axs1.plot(np.linspace(0, outputs.get("t_steps"), len(y_axis)), y_axis, "o-", color=(0,0,varying), label=f"Salary percentage: {varying}")
+        axs1.set_xlabel("Time", fontsize=14)
+        axs1.set_ylabel("Average customers over an entire simulation", color="tab:blue", fontsize=14)
 
-    axs3.plot(X1_AXIS, avg3_list, "^-", color="tab:green")
-    axs3.set_ylabel("Max percent of population infected", color="tab:green")
-    #axs3.tick_params(axis='y', labelcolor="tab:green")
-    axs3.spines['right'].set_position(('outward', 50))
-
-    axs4.plot(X1_AXIS, avg4_list, "H-", color="tab:brown")
-    axs4.set_ylabel("Timesteps until disease gone", color="tab:brown")
-    #axs4.tick_params(axis='y', labelcolor="tab:brown")
-    axs4.spines['right'].set_position(('outward', 100))
-
-    print(f"Avg.customers entire simulation: {avg1_list}")
-    print(f"% alive end of simulation: {[100*v for v in avg3_list]}%")
-    print(f"Max % infected during simulation: {[100*v for v in avg3_list]}%")
-
+    pyplot.legend(fontsize=14)
     fig.tight_layout()
     pyplot.show()
         
@@ -354,4 +322,4 @@ def test_disease():
 
 
 if __name__ == "__main__": 
-    main()
+    main2()
