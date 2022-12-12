@@ -87,7 +87,7 @@ def avg_customers(customer_history: list):
 def get_resource_cash_distribution(env: list):
     resources = [agent.resources for agent in env]
     cash = [agent.cash for agent in env]
-    return (resources, cash)
+    return resources, cash
 
 def get_max_EI(nE,nI):
     return np.max(nE+nI)
@@ -147,8 +147,8 @@ def run_simulation(
             "I": nI[:t],
             "R": nR[:t],
             "D": nD[:t],
-            "resources" : resources,
-            "cash" : cash,
+            "resources" : resources[:t],
+            "cash" : cash[:t],
         },
         "store":{
             "customers_history": store.customers_history[:t],
@@ -208,12 +208,12 @@ def main2():
     TIMESTEPS = 250
     ENV_SIZE = 250
     INITIAL_INFECTED_PER_ENV = 40
-    INFECTION_RADIUS = 4
+    INFECTION_RADIUS = Agent.DEFAULT_RADIUS
     INFECTION_RATE = Agent.DEFAULT_I_RATE
     RECOVERY_RATE = Agent.DEFAULT_R_RATE
 
     POINT_AVG = 8
-    X1_AXIS = range(0,4)
+    X1_AXIS = range(0,21)
     X1_POINTS = len(X1_AXIS)
 
     # https://stackoverflow.com/questions/9103166/multiple-axis-in-matplotlib-with-different-scales
