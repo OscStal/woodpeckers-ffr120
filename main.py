@@ -246,7 +246,7 @@ def main2():
         y_axis = outputs.get("store").get("customer_history_averaged")
         axs1.plot(np.linspace(0, outputs.get("t_steps"), len(y_axis)), y_axis, "o-", color=(0,0,varying), label=f"Salary percentage: {varying}")
         axs1.set_xlabel("Time", fontsize=14)
-        axs1.set_ylabel("Average customers over an entire simulation", color="tab:blue", fontsize=14)
+        axs1.set_ylabel("Visits to store", color="tab:blue", fontsize=14)
 
     pyplot.legend(fontsize=14)
     fig.tight_layout()
