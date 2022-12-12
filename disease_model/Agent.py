@@ -7,9 +7,9 @@ class Agent():
     DEFAULT_RADIUS = 4
     DEFAULT_I_RATE = 0.8
     DEFAULT_R_RATE = 0.02
-    DEFAULT_E2I_RATE = 0.5
+    DEFAULT_E2I_RATE = 0.3
     DEFAULT_D_RATE = 0
-    DEFAULT_STEP_SIZE = 3
+    DEFAULT_STEP_SIZE = 2.5
 
     def __init__(
         self, 
